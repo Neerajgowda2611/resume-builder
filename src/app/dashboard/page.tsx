@@ -1,21 +1,7 @@
-// // src/app/dashboard/page.tsx
-// import { Sidebar } from '@/components/layout/sidebar'
+// // // src/app/dashboard/page.tsx
 
-// export default function Dashboard() {
-//   return (
-//     <div className="flex min-h-screen">
-//       <Sidebar />
-//       <main className="flex-1 p-8">
-//         <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
-//         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-//           {/* Add dashboard cards/widgets here */}
-//         </div>
-//       </main>
-//     </div>
-//   )
-// }
+"use client";
 
-// src/app/page.tsx
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -28,7 +14,7 @@ export default function Home() {
           Create professional resumes with AI-powered suggestions and ATS optimization.
         </p>
         <div className="flex justify-center space-x-4">
-          <Link href="/dashboard/resumes/new">
+          <Link href="/resume">
             <Button size="lg">Create Resume</Button>
           </Link>
           <Link href="/dashboard/templates">
