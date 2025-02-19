@@ -1,5 +1,3 @@
-// // // src/app/dashboard/page.tsx
-
 "use client";
 
 import { Button } from '@/components/ui/button'
@@ -17,7 +15,7 @@ export default function Home() {
           <Link href="/resume">
             <Button size="lg">Create Resume</Button>
           </Link>
-          <Link href="/dashboard/templates">
+          <Link href="/dashboard/template">
             <Button variant="outline" size="lg">
               View Templates
             </Button>

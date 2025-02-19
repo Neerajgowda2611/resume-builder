@@ -55,6 +55,7 @@ export interface Skill {
 // }
 
 
+
 export interface ResumeData {
   name: string;
   email: string;
