@@ -5,15 +5,10 @@ import { useUser } from "@clerk/nextjs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/text-area";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
 import {
   ResumeData,
   Education,
@@ -73,7 +68,6 @@ export default function ResumeForm() {
     aspiringRoles: [""],
     aspiringCompanies: [""],
   });
-
   const handleArrayChange = <T extends keyof ResumeData>(
     field: T,
     index: number,
@@ -81,21 +75,39 @@ export default function ResumeForm() {
     subField?: keyof ResumeData[T][number]
   ) => {
     setResume((prev) => {
-      const newArray = [...prev[field]];
+      // Ensure the field is an array before modifying
+      if (!Array.isArray(prev[field])) return prev;
+
+      // Create a shallow copy of the existing array
+      const newArray = [...(prev[field] as ResumeData[T])];
+
       if (subField) {
-        (newArray[index] as any)[subField] = value;
+        // Ensure the element exists before modifying
+        if (index < newArray.length) {
+          (newArray[index] as ResumeData[T][number])[subField] =
+            value as ResumeData[T][number][typeof subField];
+        }
       } else {
-        newArray[index] = value as any;
+        newArray[index] = value as ResumeData[T][number];
       }
+
       return { ...prev, [field]: newArray };
     });
   };
 
   const addItem = <T extends keyof ResumeData>(field: T) => {
     setResume((prev) => {
-      const newArray = [...prev[field]];
-      const emptyItem = getEmptyItem(field);
-      newArray.push(emptyItem as any);
+      // Ensure the field is an array before modifying
+      if (!Array.isArray(prev[field])) return prev;
+
+      // Get an empty object of the correct type
+      const emptyItem: ResumeData[T][number] = getEmptyItem(
+        field
+      ) as ResumeData[T][number];
+
+      // Create a new array with the new item added
+      const newArray = [...(prev[field] as ResumeData[T]), emptyItem];
+
       return { ...prev, [field]: newArray };
     });
   };
@@ -380,6 +392,86 @@ export default function ResumeForm() {
         </CardContent>
       </Card>
 
+      {/* Certifications Section */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Certifications</h2>
+            <Button variant="outline" size="sm" onClick={() => addItem("certifications")}>
+              <Plus className="w-4 h-4 mr-2" /> Add Certification
+            </Button>
+          </div>
+          {resume.certifications.map((cert, index) => (
+            <div key={index} className="p-4 border rounded-lg mb-4">
+              <div className="flex justify-end mb-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeItem("certifications", index)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="grid gap-4">
+                <Input
+                  placeholder="Certification Name"
+                  value={cert.name}
+                  onChange={(e) =>
+                    handleArrayChange("certifications", index, e.target.value, "name")
+                  }
+                />
+                <Input
+                  placeholder="Issuing Organization"
+                  value={cert.organization}
+                  onChange={(e) =>
+                    handleArrayChange(
+                      "certifications",
+                      index,
+                      e.target.value,
+                      "organization"
+                    )
+                  }
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    type="date"
+                    placeholder="Completion Date"
+                    value={cert.year}
+                    onChange={(e) =>
+                      handleArrayChange("certifications", index, e.target.value, "year")
+                    }
+                  />
+                  <Input
+                    placeholder="Credential ID (Optional)"
+                    value={cert.credentialId || ""}
+                    onChange={(e) =>
+                      handleArrayChange(
+                        "certifications",
+                        index,
+                        e.target.value,
+                        "credentialId"
+                      )
+                    }
+                  />
+                </div>
+                <Input
+                  placeholder="Credential URL (Optional)"
+                  value={cert.credentialUrl || ""}
+                  onChange={(e) =>
+                    handleArrayChange(
+                      "certifications",
+                      index,
+                      e.target.value,
+                      "credentialUrl"
+                    )
+                  }
+                />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
       {/* Projects Section */}
       <Card className="mb-6">
         <CardContent className="pt-6">
@@ -501,20 +593,20 @@ export default function ResumeForm() {
                 }
               />
               <Select
-                value={skill.level}
-                onChange={(value: string) =>
-                  handleArrayChange("skills", index, value, "level")
-                }
-              >
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder={""} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Beginner">Beginner</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
+  value={skill.level}
+  onValueChange={(value) =>
+    handleArrayChange("skills", index, value, "level")
+  }
+>
+  <SelectTrigger className="w-[200px]">
+    <SelectValue placeholder="Select Level" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="Beginner">Beginner</SelectItem>
+    <SelectItem value="Intermediate">Intermediate</SelectItem>
+    <SelectItem value="Advanced">Advanced</SelectItem>
+  </SelectContent>
+</Select>
 
               <Button
                 variant="ghost"

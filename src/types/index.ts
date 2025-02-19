@@ -31,10 +31,11 @@ export interface Language {
 
 export interface Certification {
   name: string;
-  issuer: string;
+  organization: string;
   year: string;
+  credentialId?: string;
+  credentialUrl?: string;
 }
-
 export interface Skill {
   skill: string | number | readonly string[] | undefined;
   name: string;
@@ -64,7 +65,7 @@ export interface ResumeData {
   education: Education[];
   experience: Experience[];
   projects: Project[];
-  certifications: { name: string; organization: string; year: string }[];
+  certifications: Certification[];
   skills: Skill[];
   languages: Language[];
   hobbies: string[];
