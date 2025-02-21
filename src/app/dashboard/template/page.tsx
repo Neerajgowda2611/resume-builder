@@ -31,7 +31,7 @@ const MinimalClassic: React.FC<MinimalClassicProps> = ({
   const containerClass = cn(
     "bg-white w-full",
     preview
-      ? "scale-[0.4] origin-top"
+      ? "scale-[0.5] origin-top"
       : "min-h-[297mm] w-[210mm] mx-auto shadow-lg",
     font === "inter" && "font-inter",
     font === "roboto" && "font-roboto",
@@ -62,8 +62,7 @@ const MinimalClassic: React.FC<MinimalClassicProps> = ({
           </h2>
           <p className="text-gray-700">
             Senior Software Engineer with 8+ years of experience in full-stack
-            development, specializing in React and Node.js. Led multiple
-            successful projects and mentored junior developers.
+            development, specializing in React and Node.js.
           </p>
         </section>
 
@@ -85,8 +84,29 @@ const MinimalClassic: React.FC<MinimalClassicProps> = ({
                   Led development of microservices architecture serving 1M+
                   users
                 </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* education */}
+
+        <section>
+          <h2
+            className="text-xl font-semibold mb-4"
+            style={{ color: primaryColor }}
+          >
+            Education
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold">
+                Cambridge University
+              </h3>
+              <p className="text-gray-600">2020 - Present</p>
+              <ul className="list-disc ml-4 mt-2 text-gray-700">
                 <li>
-                  Improved application performance by 40% through optimization
+                  .Year -2016 to 2020
                 </li>
               </ul>
             </div>
@@ -101,7 +121,7 @@ const MinimalClassic: React.FC<MinimalClassicProps> = ({
             Skills
           </h2>
           <div className="flex flex-wrap gap-2">
-            {["React", "Node.js", "TypeScript", "AWS", "Docker"].map(
+            {["React", "Node.js", "TypeScript", "AWS"].map(
               (skill) => (
                 <span
                   key={skill}
@@ -117,6 +137,32 @@ const MinimalClassic: React.FC<MinimalClassicProps> = ({
             )}
           </div>
         </section>
+{/* hobby section */}
+        <section>
+          <h2
+            className="text-xl font-semibold mb-4"
+            style={{ color: primaryColor }}
+          >
+            Hobbies
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {["Singing", "Dancing", "Travelling", "Hiking"].map(
+              (skill) => (
+                <span
+                  key={skill}
+                  className="px-3 py-1 rounded-full text-sm"
+                  style={{
+                    backgroundColor: `${primaryColor}20`,
+                    color: primaryColor,
+                  }}
+                >
+                  {skill}
+                </span>
+              )
+            )}
+          </div>
+        </section>
+
       </main>
     </div>
   );
@@ -136,22 +182,25 @@ const ModernProfessional: React.FC<ModernProfessionalProps> = ({
   const containerClass = cn(
     "bg-white",
     preview
-      ? "scale-[0.4] origin-top"
-      : "min-h-[297mm] w-[210mm] mx-auto shadow-lg",
+      ? "scale-[0.5] origin-top"
+      : "min-h-[297mm] w-full max-w-[1280px] mx-auto shadow-lg",
     font === "inter" && "font-inter",
     font === "roboto" && "font-roboto",
     font === "opensans" && "font-opensans",
     font === "lato" && "font-lato"
   );
-
+  
   return (
     <div className={containerClass}>
+      {/* Header with primary color */}
       <div className="h-8" style={{ backgroundColor: primaryColor }}></div>
       <div className="grid grid-cols-3 gap-8 p-8">
+        {/* Left Section (Main Content) */}
         <div className="col-span-2">
           <h1 className="text-4xl font-bold mb-2">John Smith</h1>
           <p className="text-xl text-gray-600 mb-6">Senior Software Engineer</p>
 
+          {/* About Me */}
           <section className="mb-8">
             <h2
               className="text-xl font-semibold mb-4"
@@ -166,7 +215,8 @@ const ModernProfessional: React.FC<ModernProfessionalProps> = ({
             </p>
           </section>
 
-          <section>
+          {/* Experience */}
+          <section className="mb-8">
             <h2
               className="text-xl font-semibold mb-4"
               style={{ color: primaryColor }}
@@ -186,9 +236,29 @@ const ModernProfessional: React.FC<ModernProfessionalProps> = ({
               </div>
             </div>
           </section>
+
+          {/* Education */}
+          <section className="mb-8">
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Education
+            </h2>
+            <div>
+              <h3 className="font-semibold">
+                University of California, Berkeley
+              </h3>
+              <p className="text-gray-600 mb-2">
+                B.S. in Computer Science <br />• 2016 - 2020
+              </p>
+            </div>
+          </section>
         </div>
 
-        <div className="space-y-8">
+        {/* Right Sidebar */}
+        <div className="max-w-60 space-y-8">
+          {/* Contact Information */}
           <section>
             <h2
               className="text-xl font-semibold mb-4"
@@ -197,12 +267,12 @@ const ModernProfessional: React.FC<ModernProfessionalProps> = ({
               Contact
             </h2>
             <div className="space-y-2 text-gray-700">
-              <p>john.smith@email.com</p>
+              <p>john@email.com</p>
               <p>(555) 123-4567</p>
               <p>San Francisco, CA</p>
             </div>
           </section>
-
+          {/* Skills */}
           <section>
             <h2
               className="text-xl font-semibold mb-4"
@@ -226,6 +296,21 @@ const ModernProfessional: React.FC<ModernProfessionalProps> = ({
                 )
               )}
             </div>
+          </section>
+          {/* Hobbies */}
+          <section>
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Hobbies
+            </h2>
+            <ul className="list-disc ml-4 text-gray-700">
+              <li>Photography</li>
+              <li>Hiking & Outdoor Adventures</li>
+              <li>Reading Tech Blogs</li>
+              <li>Playing Guitar</li>
+            </ul>
           </section>
         </div>
       </div>
@@ -263,63 +348,32 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
 }) => {
   const Template = TEMPLATES[id];
 
-  //   return (
-  //     <Card className="w-full">
-  //       <CardHeader>
-  //         <CardTitle className="text-lg">{title}</CardTitle>
-  //       </CardHeader>
-  //       <CardContent>
-  //         <div className="aspect-[8.5/11] w-full bg-gray-100 mb-4 overflow-hidden relative">
-  //           <div className="absolute top-0 left-0 w-full">
-  //             <div className="transform scale-[0.35] origin-top">
-  //               <Template
-  //                 font={font}
-  //                 primaryColor={primaryColor}
-  //                 preview={true}
-  //               />
-  //             </div>
-  //           </div>
-  //         </div>
-  //         <p className="text-sm text-gray-600 mb-4">{description}</p>
-  //         <div className="flex space-x-2">
-  //           <Button onClick={onSelect} className="w-full">
-  //             Use Template
-  //           </Button>
-  //           <Button variant="outline">
-  //             <Eye className="h-4 w-4" />
-  //           </Button>
-  //         </div>
-  //       </CardContent>
-  //     </Card>
-  //   );
-  // };
-
   return (
-    <Card className="w-full">
-  <CardHeader>
-    <CardTitle className="text-lg">{title}</CardTitle>
-  </CardHeader>
-  <CardContent>
-    {/* Ensuring it takes full space and fits perfectly */}
-    <div className="w-full h-[400px] bg-gray-100 mb-4 flex items-center justify-center overflow-hidden">
-      <div className="w-full h-full">
-        <Template font={font} primaryColor={primaryColor} preview={true} />
-      </div>
-    </div>
-    
-    <p className="text-sm text-gray-600 mb-4">{description}</p>
-    
-    <div className="flex space-x-2">
-      <Button onClick={onSelect} className="w-full">
-        Use Template
-      </Button>
-      <Button variant="outline">
-        <Eye className="h-4 w-4" />
-      </Button>
-    </div>
-  </CardContent>
-</Card>
+    <Card className="w-full max-w-[900px] mx-auto">
+      <CardHeader>
+        <CardTitle className="text-lg">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Ensuring Template fits perfectly inside */}
+        <div className="w-full h-[400px] bg-gray-100 mb-4 flex items-center justify-center overflow-hidden">
+          {/* This wrapper ensures Template scales properly */}
+          <div className="relative w-full h-full">
+            <Template font={font} primaryColor={primaryColor} preview={true} />
+          </div>
+        </div>
 
+        <p className="text-sm text-gray-600 mb-4">{description}</p>
+
+        <div className="flex space-x-2">
+          <Button onClick={onSelect} className="w-full">
+            Use Template
+          </Button>
+          <Button variant="outline">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
