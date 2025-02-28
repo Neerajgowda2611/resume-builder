@@ -27,5 +27,8 @@ body {
 @tailwind utilities;
 
 body {
-  @apply bg-gray-100 text-gray-900;
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+  backdrop-filter: blur(10px); /* Blur effect */
+  -webkit-backdrop-filter: blur(10px); /* For Safari */
 }
+
