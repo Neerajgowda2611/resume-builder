@@ -171,10 +171,12 @@ export default function ResumeForm() {
 
   return (
     <main className="p-6 max-w-3xl mx-auto">
+
       <h1 className="text-2xl font-bold mb-6">Create Your Resume</h1>
 
       {/* Personal Info */}
-      <Card>
+      <Card className="bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+
         <CardContent className="pt-6">
           <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
           <div className="grid gap-4">
