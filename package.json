@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^6.11.3",
     "@hookform/resolvers": "^4.1.0",
     "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-toast": "^1.2.6",
     "@shadcn/ui": "^0.0.4",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
