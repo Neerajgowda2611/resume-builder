@@ -1,9 +1,9 @@
 export interface Education {
-  endDate?: string | number | readonly string[] | undefined;
-  startDate?: string | number | readonly string[] | undefined;
+  id?: string; // Added to track existing records
   degree: string;
   institution: string;
-  year: string;
+  year_of_start: string; // Changed to match API
+  year_of_completion: string; // Changed to match API
 }
 
 export interface Experience {
