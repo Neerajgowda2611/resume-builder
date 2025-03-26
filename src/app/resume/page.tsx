@@ -20,6 +20,7 @@
     AccordionItem,
     AccordionTrigger,
   } from "@/components/ui/accordion";
+  import {Toaster} from "react-hot-toast";
   import {
     Select,
     SelectContent,
@@ -311,124 +312,65 @@
         };
       });
     };
-
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       console.log("Submitting form data::::::::::::::::::::::::::", formData);
+    
       if (!userId) {
         setError("User not authenticated. Please log in.");
         return;
       }
-
+    
       setLoading(true);
       setError(null);
       setSuccess(false);
-
-      // // Clean up the data by removing empty entries
-      // const cleanData = {
-      //   ...formData,
-      //   hobbies: formData.hobbies.filter((item) => item.trim() !== ""),
-      //   aspiringRoles: formData.aspiringRoles.filter(
-      //     (item) => item.trim() !== ""
-      //   ),
-      //   aspiringCompanies: formData.aspiringCompanies.filter(
-      //     (item) => item.trim() !== ""
-      //   ),
-      //   education: formData.education.filter(
-      //     (item) => item.degree.trim() !== "" || item.institution.trim() !== ""
-      //   ),
-      //   experience: formData.experience.filter(
-      //     (item) => item.jobTitle.trim() !== "" || item.company.trim() !== ""
-      //   ),
-      //   projects: formData.projects.filter((item) => item.name.trim() !== ""),
-      //   certifications: formData.certifications.filter(
-      //     (item) => item.name.trim() !== ""
-      //   ),
-      //   skills: formData.skills.filter((item) => item.name.trim() !== ""),
-      //   languages: formData.languages.filter(
-      //     (item) => item.language.trim() !== ""
-      //   ),
-      // };
-
-      const cleanData = {
-        ...formData,
-        hobbies: formData.hobbies.filter((item) => item?.trim() !== ""),
-        aspiringRoles: formData.aspiringRoles.filter((item) => item?.trim() !== ""),
-        aspiringCompanies: formData.aspiringCompanies.filter((item) => item?.trim() !== ""),
-        education: formData.education.filter(
-          (item) => item.degree?.trim() !== "" || item.institution?.trim() !== ""
-        ),
-        experience: formData.experience.filter(
-          (item) => item.jobTitle?.trim() !== "" || item.company?.trim() !== ""
-        ),
-        projects: formData.projects.filter(
-          (item) => item.name?.trim() !== "" || item.description?.trim() !== ""
-        ),
-        certifications: formData.certifications.filter(
-          (item) => item.name?.trim() !== "" || item.organization?.trim() !== ""
-        ),
-        skills: formData.skills.filter(
-          (item) => typeof item.skill === "string" && item.skill.trim() !== ""
-        ),
-        languages: formData.languages.filter((item) => item.language?.trim() !== ""),
-      };
-      
-      console.log("Cleaned data before sending:", cleanData);
-
+    
       try {
-        // Determine whether to use POST (new) or PATCH (update) based on whether we already have data
         const method = resumeExists ? "PATCH" : "POST";
-
-        const response = await fetch(
-          `http://localhost:8000/api/resume?user_id=${userId}`,
-          {
-            method: method,
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(cleanData),
-          }
-        );
-
+    
+        const response = await fetch(`http://localhost:8000/api/resume?user_id=${userId}`, {
+          method: method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+    
         if (!response.ok) {
-          throw new Error(
-            `Error ${resumeExists ? "updating" : "submitting"} data: ${
-              response.status
-            }`
-          );
+          throw new Error(`Error ${resumeExists ? "updating" : "submitting"} data: ${response.status}`);
         }
-
-        // Update success message based on the operation
-        setSuccessMessage(
-          resumeExists
-            ? "Resume updated successfully!"
-            : "Resume created successfully!"
-        );
-        setSuccess(true);
-
-        // Update with the returned data (in case the server modified anything)
+    
+        console.log("Response received:", response);
+    
         const updatedData = await response.json();
-        setFormData(updatedData);
-
-        // We now have a resume after successful creation
+        console.log("Updated data received:", updatedData);
+    
+        // ✅ Ensure `updatedData` has the required structure
+        if (!updatedData || typeof updatedData !== "object") {
+          throw new Error("Invalid response data received");
+        }
+    
+        // ✅ Merge `updatedData` with existing form data to avoid losing fields
+        setFormData((prevData) => ({
+          ...prevData,
+          ...updatedData, // Update only the new fields
+        }));
+    
+        setSuccessMessage(resumeExists ? "Resume updated successfully!" : "Resume created successfully!");
+        setSuccess(true);
+    
         if (!resumeExists) {
           setResumeExists(true);
         }
+    
+        // ✅ Hide success message after 3 seconds
+        setTimeout(() => setSuccess(false), 3000);
       } catch (err) {
-        console.error(
-          `Failed to ${resumeExists ? "update" : "create"} resume data:`,
-          err
-        );
-        setError(
-          `Failed to ${
-            resumeExists ? "update" : "create"
-          } resume data. Please try again later.`
-        );
+        console.error(`Failed to ${resumeExists ? "update" : "create"} resume data:`, err);
+        setError(`Failed to ${resumeExists ? "update" : "create"} resume data. Please try again later.`);
       } finally {
         setLoading(false);
       }
     };
-
+    
     // Add a function to handle deleting the entire resume
     const handleDeleteResume = async () => {
       if (!userId || !resumeExists) {
@@ -1561,6 +1503,7 @@
                     </>
                   )}
                 </Button>
+                
               </CardFooter>
             </form>
           </CardContent>
