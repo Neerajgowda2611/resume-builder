@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,69 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@clerk/nextjs";
+
+// Define types for our data (keeping the same interfaces)
+interface Education {
+  degree: string;
+  institution: string;
+  year_of_start: string;
+  year_of_completion: string;
+}
+
+interface Experience {
+  jobTitle: string;
+  company: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+}
+
+interface Project {
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  techStack: string;
+  link: string;
+}
+
+interface Certification {
+  name: string;
+  organization: string;
+  year: string;
+  credentialId: string;
+  credentialUrl: string;
+}
+
+interface Skill {
+  skill: string;
+  name: string;
+  level: string;
+}
+
+interface Language {
+  language: string;
+  proficiency: string;
+}
+
+interface UserData {
+  name: string;
+  email: string;
+  profilePicture: string;
+  aboutMe: string;
+  linkedIn: string;
+  github: string;
+  education: Education[];
+  experience: Experience[];
+  projects: Project[];
+  certifications: Certification[];
+  skills: Skill[];
+  languages: Language[];
+  hobbies: string[];
+  aspiringRoles: string[];
+  aspiringCompanies: string[];
+}
 
 // Define font type
 type FontType = "inter" | "roboto" | "opensans" | "lato";
@@ -22,7 +84,20 @@ interface BaseTemplateProps {
   font: FontType;
   primaryColor: string;
   preview?: boolean;
+  userData: UserData | null;
 }
+
+// Helper function to format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return "";
+  
+  try {
+    const [day, month, year] = dateString.split("-");
+    return `${month}/${year}`;
+  } catch (e) {
+    return dateString;
+  }
+};
 
 // Helper function to get A4 container class
 const getA4ContainerClass = (font: FontType, preview: boolean) => {
@@ -30,7 +105,7 @@ const getA4ContainerClass = (font: FontType, preview: boolean) => {
     "bg-white",
     // A4 dimensions: 210mm x 297mm - but when preview, scale down
     preview
-      ? "scale-[1.5] origin-top w-[210mm]"
+      ? "scale-[0.7] origin-top-left w-[210mm]"
       : "min-h-[297mm] w-[210mm] mx-auto shadow-lg", 
     font === "inter" && "font-inter",
     font === "roboto" && "font-roboto",
@@ -44,130 +119,139 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
+  userData
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
+  
+  // If userData is not yet loaded, show loading placeholder
+  if (!userData) {
+    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+  }
 
   return (
     <div className={containerClass}>
       <header className="p-8 border-b" style={{ borderColor: primaryColor }}>
         <h1 className="text-3xl font-bold mb-2" style={{ color: primaryColor }}>
-          John Smith
+          {userData.name}
         </h1>
         <div className="text-gray-600 space-y-1">
-          <p>Senior Software Engineer</p>
-          <p>john.smith@email.com • (555) 123-4567</p>
-          <p>San Francisco, CA</p>
+          <p>{userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}</p>
+          <p>{userData.email} • {userData.linkedIn}</p>
         </div>
       </header>
 
       <main className="p-8 space-y-6">
-        <section>
-          <h2
-            className="text-xl font-semibold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Professional Summary
-          </h2>
-          <p className="text-gray-700">
-            Senior Software Engineer with 8+ years of experience in full-stack
-            development, specializing in React and Node.js.
-          </p>
-        </section>
+        {userData.aboutMe && (
+          <section>
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Professional Summary
+            </h2>
+            <p className="text-gray-700">
+              {userData.aboutMe}
+            </p>
+          </section>
+        )}
 
-        <section>
-          <h2
-            className="text-xl font-semibold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Experience
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold">
-                Senior Software Engineer - Tech Corp
-              </h3>
-              <p className="text-gray-600">2020 - Present</p>
-              <ul className="list-disc ml-4 mt-2 text-gray-700">
-                <li>
-                  Led development of microservices architecture serving 1M+
-                  users
-                </li>
-              </ul>
+        {userData.experience && userData.experience.length > 0 && (
+          <section>
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Experience
+            </h2>
+            <div className="space-y-4">
+              {userData.experience.map((exp, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold">
+                    {exp.jobTitle} - {exp.company}
+                  </h3>
+                  <p className="text-gray-600">
+                    {formatDate(exp.startDate)} - {exp.endDate === "Present" ? "Present" : formatDate(exp.endDate)}
+                  </p>
+                  <ul className="list-disc ml-4 mt-2 text-gray-700">
+                    <li>{exp.description}</li>
+                  </ul>
+                </div>
+              ))}
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        <section>
-          <h2
-            className="text-xl font-semibold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Education
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold">
-                Cambridge University
-              </h3>
-              <p className="text-gray-600">2016 - 2020</p>
-              <ul className="list-disc ml-4 mt-2 text-gray-700">
-                <li>
-                  Bachelor of Science in Computer Science
-                </li>
-              </ul>
+        {userData.education && userData.education.length > 0 && (
+          <section>
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Education
+            </h2>
+            <div className="space-y-4">
+              {userData.education.map((edu, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold">{edu.institution}</h3>
+                  <p className="text-gray-600">{edu.year_of_start} - {edu.year_of_completion}</p>
+                  <ul className="list-disc ml-4 mt-2 text-gray-700">
+                    <li>{edu.degree}</li>
+                  </ul>
+                </div>
+              ))}
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        <section>
-          <h2
-            className="text-xl font-semibold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Skills
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {["React", "Node.js", "TypeScript", "AWS"].map(
-              (skill) => (
+        {userData.skills && userData.skills.length > 0 && (
+          <section>
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Skills
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {userData.skills.map((skill, index) => (
                 <span
-                  key={skill}
+                  key={index}
                   className="px-3 py-1 rounded-full text-sm"
                   style={{
                     backgroundColor: `${primaryColor}20`,
                     color: primaryColor,
                   }}
                 >
-                  {skill}
+                  {skill.name}
                 </span>
-              )
-            )}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
 
-        <section>
-          <h2
-            className="text-xl font-semibold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Hobbies
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {["Singing", "Dancing", "Travelling", "Hiking"].map(
-              (skill) => (
+        {userData.hobbies && userData.hobbies.length > 0 && (
+          <section>
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Hobbies
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {userData.hobbies.map((hobby, index) => (
                 <span
-                  key={skill}
+                  key={index}
                   className="px-3 py-1 rounded-full text-sm"
                   style={{
                     backgroundColor: `${primaryColor}20`,
                     color: primaryColor,
                   }}
                 >
-                  {skill}
+                  {hobby}
                 </span>
-              )
-            )}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
@@ -178,8 +262,13 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
+  userData
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
+  
+  if (!userData) {
+    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+  }
   
   return (
     <div className={containerClass}>
@@ -188,63 +277,68 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
       <div className="grid grid-cols-3 gap-8 p-8">
         {/* Left Section (Main Content) */}
         <div className="col-span-2">
-          <h1 className="text-4xl font-bold mb-2">John Smith</h1>
-          <p className="text-xl text-gray-600 mb-6">Senior Software Engineer</p>
+          <h1 className="text-4xl font-bold mb-2">{userData.name}</h1>
+          <p className="text-xl text-gray-600 mb-6">
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
+          </p>
 
           {/* About Me */}
-          <section className="mb-8">
-            <h2
-              className="text-xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              About Me
-            </h2>
-            <p className="text-gray-700">
-              Innovative Senior Software Engineer passionate about creating
-              efficient, scalable solutions. Experienced in leading teams and
-              delivering high-impact projects.
-            </p>
-          </section>
+          {userData.aboutMe && (
+            <section className="mb-8">
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: primaryColor }}
+              >
+                About Me
+              </h2>
+              <p className="text-gray-700">{userData.aboutMe}</p>
+            </section>
+          )}
 
           {/* Experience */}
-          <section className="mb-8">
-            <h2
-              className="text-xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Experience
-            </h2>
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-semibold">Tech Corp</h3>
-                <p className="text-gray-600 mb-2">
-                  Senior Software Engineer • 2020 - Present
-                </p>
-                <ul className="list-disc ml-4 text-gray-700">
-                  <li>Led development of microservices architecture</li>
-                  <li>Improved application performance by 40%</li>
-                </ul>
+          {userData.experience && userData.experience.length > 0 && (
+            <section className="mb-8">
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: primaryColor }}
+              >
+                Experience
+              </h2>
+              <div className="space-y-6">
+                {userData.experience.map((exp, index) => (
+                  <div key={index}>
+                    <h3 className="font-semibold">{exp.company}</h3>
+                    <p className="text-gray-600 mb-2">
+                      {exp.jobTitle} • {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+                    </p>
+                    <ul className="list-disc ml-4 text-gray-700">
+                      <li>{exp.description}</li>
+                    </ul>
+                  </div>
+                ))}
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* Education */}
-          <section className="mb-8">
-            <h2
-              className="text-xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Education
-            </h2>
-            <div>
-              <h3 className="font-semibold">
-                University of California, Berkeley
-              </h3>
-              <p className="text-gray-600 mb-2">
-                B.S. in Computer Science <br />• 2016 - 2020
-              </p>
-            </div>
-          </section>
+          {userData.education && userData.education.length > 0 && (
+            <section className="mb-8">
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: primaryColor }}
+              >
+                Education
+              </h2>
+              {userData.education.map((edu, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold">{edu.institution}</h3>
+                  <p className="text-gray-600 mb-2">
+                    {edu.degree} <br />• {edu.year_of_start} - {edu.year_of_completion}
+                  </p>
+                </div>
+              ))}
+            </section>
+          )}
         </div>
 
         {/* Right Sidebar */}
@@ -258,148 +352,505 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
               Contact
             </h2>
             <div className="space-y-2 text-gray-700">
-              <p>john@email.com</p>
-              <p>(555) 123-4567</p>
-              <p>San Francisco, CA</p>
+              <p>{userData.email}</p>
+              {userData.linkedIn && <p>{userData.linkedIn}</p>}
+              {userData.github && <p>{userData.github}</p>}
             </div>
           </section>
+          
           {/* Skills */}
-          <section>
-            <h2
-              className="text-xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Skills
-            </h2>
-            <div className="space-y-2">
-              {["React", "Node.js", "TypeScript", "AWS", "Docker"].map(
-                (skill) => (
+          {userData.skills && userData.skills.length > 0 && (
+            <section>
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: primaryColor }}
+              >
+                Skills
+              </h2>
+              <div className="space-y-2">
+                {userData.skills.map((skill, index) => (
                   <div
-                    key={skill}
+                    key={index}
                     className="p-2 rounded"
                     style={{
                       backgroundColor: `${primaryColor}10`,
                       color: primaryColor,
                     }}
                   >
-                    {skill}
+                    {skill.name}
                   </div>
-                )
-              )}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          )}
+          
           {/* Hobbies */}
-          <section>
-            <h2
-              className="text-xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Hobbies
-            </h2>
-            <ul className="list-disc ml-4 text-gray-700">
-              <li>Photography</li>
-              <li>Hiking & Outdoor Adventures</li>
-              <li>Reading Tech Blogs</li>
-              <li>Playing Guitar</li>
-            </ul>
-          </section>
+          {userData.hobbies && userData.hobbies.length > 0 && (
+            <section>
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: primaryColor }}
+              >
+                Hobbies
+              </h2>
+              <ul className="list-disc ml-4 text-gray-700">
+                {userData.hobbies.map((hobby, index) => (
+                  <li key={index}>{hobby}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Languages */}
+          {userData.languages && userData.languages.length > 0 && (
+            <section>
+              <h2
+                className="text-xl font-semibold mb-4"
+                style={{ color: primaryColor }}
+              >
+                Languages
+              </h2>
+              <ul className="list-disc ml-4 text-gray-700">
+                {userData.languages.map((lang, index) => (
+                  <li key={index}>{lang.language} - {lang.proficiency}</li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// 3. Bold Creative Template (New)
+// // 3. Bold Creative Template
+// const BoldCreative: React.FC<BaseTemplateProps> = ({
+//   font,
+//   primaryColor,
+//   preview = false,
+//   userData
+// }) => {
+//   const containerClass = getA4ContainerClass(font, preview);
+
+//   if (!userData) {
+//     return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+//   }
+  
+//   // Get user initials for avatar
+//   const getInitials = (name: string) => {
+//     if (!name) return "N/A";
+//     return name.split(' ').map(n => n[0]).join('').toUpperCase();
+//   };
+  
+//   return (
+//     <div className={containerClass}>
+//       <div className="flex h-full">
+//         {/* Sidebar */}
+//         <div 
+//           className="w-1/3 p-8 text-white" 
+//           style={{ backgroundColor: primaryColor }}
+//         >
+//           <div className="mb-12">
+//             <div className="w-32 h-32 rounded-full bg-white mb-4 mx-auto overflow-hidden">
+//               {/* Profile Image or Placeholder */}
+//               <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+//                 {userData.profilePicture ? (
+//                   <img src={userData.profilePicture} alt={userData.name} className="w-full h-full object-cover" />
+//                 ) : (
+//                   <span className="text-gray-600 text-2xl">{getInitials(userData.name)}</span>
+//                 )}
+//               </div>
+//             </div>
+//             <h1 className="text-2xl font-bold text-center mb-1">{userData.name}</h1>
+//             <p className="text-center opacity-90">
+//               {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
+//             </p>
+//           </div>
+          
+//           <div className="space-y-8">
+//             <section>
+//               <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+//                 Contact
+//               </h2>
+//               <div className="space-y-2">
+//                 <p>{userData.email}</p>
+//                 {userData.linkedIn && <p>{userData.linkedIn}</p>}
+//                 {userData.github && <p>{userData.github}</p>}
+//               </div>
+//             </section>
+            
+//             {userData.skills && userData.skills.length > 0 && (
+//               <section>
+//                 <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+//                   Skills
+//                 </h2>
+//                 <div className="space-y-1">
+//                   {userData.skills.map((skill, index) => (
+//                     <div key={index} className="flex items-center">
+//                       <div className="w-24">{skill.name}</div>
+//                       <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
+//                         <div 
+//                           className="bg-white h-2 rounded-full" 
+//                           style={{ 
+//                             width: skill.level === "Beginner" ? "33%" : 
+//                                    skill.level === "Intermediate" ? "66%" : "90%" 
+//                           }}
+//                         ></div>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </section>
+//             )}
+            
+//             {userData.hobbies && userData.hobbies.length > 0 && (
+//               <section>
+//                 <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+//                   Hobbies
+//                 </h2>
+//                 <div className="flex flex-wrap gap-2">
+//                   {userData.hobbies.map((hobby, index) => (
+//                     <span 
+//                       key={index}
+//                       className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm"
+//                     >
+//                       {hobby}
+//                     </span>
+//                   ))}
+//                 </div>
+//               </section>
+//             )}
+
+//             {userData.languages && userData.languages.length > 0 && (
+//               <section>
+//                 <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+//                   Languages
+//                 </h2>
+//                 <div className="space-y-1">
+//                   {userData.languages.map((lang, index) => (
+//                     <div key={index} className="flex items-center">
+//                       <div className="w-24">{lang.language}</div>
+//                       <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
+//                         <div 
+//                           className="bg-white h-2 rounded-full" 
+//                           style={{ 
+//                             width: lang.proficiency === "Beginner" ? "33%" : 
+//                                    lang.proficiency === "Intermediate" ? "66%" : "90%" 
+//                           }}
+//                         ></div>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </section>
+//             )}
+//           </div>
+//         </div>
+        
+//         {/* Main Content */}
+//         <div className="w-2/3 p-8 bg-white">
+//           {userData.aboutMe && (
+//             <section className="mb-8">
+//               <h2 
+//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
+//                 style={{ borderColor: primaryColor, color: primaryColor }}
+//               >
+//                 About Me
+//               </h2>
+//               <p className="text-gray-700">{userData.aboutMe}</p>
+//             </section>
+//           )}
+          
+//           {userData.experience && userData.experience.length > 0 && (
+//             <section className="mb-8">
+//               <h2 
+//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
+//                 style={{ borderColor: primaryColor, color: primaryColor }}
+//               >
+//                 Experience
+//               </h2>
+//               <div className="space-y-4">
+//                 {userData.experience.map((exp, index) => (
+//                   <div key={index}>
+//                     <div className="flex justify-between items-center">
+//                       <h3 className="font-bold">{exp.jobTitle}</h3>
+//                       <span className="text-sm text-gray-500">
+//                         {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+//                       </span>
+//                     </div>
+//                     <p className="text-gray-600 italic mb-2">{exp.company}</p>
+//                     <ul className="list-disc ml-4 text-gray-700">
+//                       <li>{exp.description}</li>
+//                     </ul>
+//                   </div>
+//                 ))}
+//               </div>
+//             </section>
+//           )}
+          
+//           {userData.education && userData.education.length > 0 && (
+//             <section>
+//               <h2 
+//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
+//                 style={{ borderColor: primaryColor, color: primaryColor }}
+//               >
+//                 Education
+//               </h2>
+//               {userData.education.map((edu, index) => (
+//                 <div key={index}>
+//                   <div className="flex justify-between items-center">
+//                     <h3 className="font-bold">{edu.degree}</h3>
+//                     <span className="text-sm text-gray-500">{edu.year_of_start} - {edu.year_of_completion}</span>
+//                   </div>
+//                   <p className="text-gray-600 italic">{edu.institution}</p>
+//                 </div>
+//               ))}
+//             </section>
+//           )}
+
+//           {userData.projects && userData.projects.length > 0 && (
+//             <section className="mt-8">
+//               <h2 
+//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
+//                 style={{ borderColor: primaryColor, color: primaryColor }}
+//               >
+//                 Projects
+//               </h2>
+//               <div className="space-y-4">
+//                 {userData.projects.map((project, index) => (
+//                   <div key={index}>
+//                     <div className="flex justify-between items-center">
+//                       <h3 className="font-bold">{project.name}</h3>
+//                       <span className="text-sm text-gray-500">
+//                         {formatDate(project.startDate)} - {formatDate(project.endDate)}
+//                       </span>
+//                     </div>
+//                     <p className="text-gray-600 italic mb-2">{project.techStack}</p>
+//                     <p className="text-gray-700">{project.description}</p>
+//                     {project.link && (
+//                       <p className="text-sm mt-1">
+//                         <a 
+//                           href={project.link} 
+//                           target="_blank" 
+//                           rel="noopener noreferrer"
+//                           style={{ color: primaryColor }}
+//                         >
+//                           View Project
+//                         </a>
+//                       </p>
+//                     )}
+//                   </div>
+//                 ))}
+//               </div>
+//             </section>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
+// 3. Bold Creative Template
 const BoldCreative: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
+  userData
 }) => {
-  const containerClass = getA4ContainerClass(font, preview);
+  // Define A4 dimensions in pixels (at 96 DPI)
+  // A4: 210mm × 297mm ≈ 793px × 1123px
+  const A4_WIDTH = 793;
+  const A4_HEIGHT = 1123;
   
-  return (
-    <div className={containerClass}>
-      <div className="flex h-full">
-        {/* Sidebar */}
-        <div 
-          className="w-1/3 p-8 text-white" 
-          style={{ backgroundColor: primaryColor }}
-        >
-          <div className="mb-12">
-            <div className="w-32 h-32 rounded-full bg-white mb-4 mx-auto overflow-hidden">
-              {/* Profile Image Placeholder */}
-              <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                <span className="text-gray-600 text-2xl">JS</span>
-              </div>
-            </div>
-            <h1 className="text-2xl font-bold text-center mb-1">John Smith</h1>
-            <p className="text-center opacity-90">Software Engineer</p>
-          </div>
-          
-          <div className="space-y-8">
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-                Contact
-              </h2>
-              <div className="space-y-2">
-                <p>john.smith@email.com</p>
-                <p>(555) 123-4567</p>
-                <p>San Francisco, CA</p>
-              </div>
-            </section>
-            
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-                Skills
-              </h2>
-              <div className="space-y-1">
-                <div className="flex items-center">
-                  <div className="w-24">React</div>
-                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                    <div className="bg-white h-2 rounded-full w-4/5"></div>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-24">Node.js</div>
-                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                    <div className="bg-white h-2 rounded-full w-3/4"></div>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-24">TypeScript</div>
-                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                    <div className="bg-white h-2 rounded-full w-4/5"></div>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-24">AWS</div>
-                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                    <div className="bg-white h-2 rounded-full w-2/3"></div>
-                  </div>
-                </div>
-              </div>
-            </section>
-            
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-                Hobbies
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {["Music", "Travel", "Photography", "Cycling"].map((hobby) => (
-                  <span 
-                    key={hobby}
-                    className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm"
-                  >
-                    {hobby}
-                  </span>
-                ))}
-              </div>
-            </section>
+  // State to track pagination
+  const [pages, setPages] = React.useState<any[]>([]);
+  
+  // Function to split content across pages
+  React.useEffect(() => {
+    if (!userData) return;
+    
+    // Determine how to split content
+    const contentSections = [];
+    
+    // Add sections in order of importance
+    if (userData.aboutMe) {
+      contentSections.push({ type: 'aboutMe', height: 150 });
+    }
+    
+    if (userData.experience && userData.experience.length > 0) {
+      // Estimate 120px per experience entry
+      userData.experience.forEach((exp, index) => {
+        contentSections.push({ type: 'experience', index, height: 120 });
+      });
+    }
+    
+    if (userData.education && userData.education.length > 0) {
+      // Estimate 80px per education entry
+      userData.education.forEach((edu, index) => {
+        contentSections.push({ type: 'education', index, height: 80 });
+      });
+    }
+    
+    if (userData.projects && userData.projects.length > 0) {
+      // Estimate 150px per project entry
+      userData.projects.forEach((project, index) => {
+        contentSections.push({ type: 'project', index, height: 150 });
+      });
+    }
+    
+    // Create pages by distributing content
+    const newPages = [];
+    let currentPage: any = { content: [] };
+    let currentHeight = 0;
+    
+    // Header height (About Me title etc.)
+    const HEADER_HEIGHT = 80;
+    // Maximum content height per page (accounting for margins)
+    const MAX_CONTENT_HEIGHT = A4_HEIGHT - 120;
+    
+    contentSections.forEach((section) => {
+      // If adding this section would exceed page height, create a new page
+      if (currentHeight + section.height + (currentPage.content.length > 0 ? HEADER_HEIGHT : 0) > MAX_CONTENT_HEIGHT) {
+        newPages.push(currentPage);
+        currentPage = { content: [] };
+        currentHeight = 0;
+      }
+      
+      currentPage.content.push(section);
+      currentHeight += section.height;
+    });
+    
+    // Add the last page
+    if (currentPage.content.length > 0) {
+      newPages.push(currentPage);
+    }
+    
+    setPages(newPages);
+  }, [userData]);
+  
+  const containerClass = `font-${font || 'sans'} ${preview ? '' : 'print:shadow-none'}`;
+
+  if (!userData) {
+    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+  }
+  
+  // Get user initials for avatar
+  const getInitials = (name: string) => {
+    if (!name) return "N/A";
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+  
+  // Render sidebar content
+  const renderSidebar = () => (
+    <div 
+      className="w-1/3 p-8 text-white" 
+      style={{ backgroundColor: primaryColor }}
+    >
+      <div className="mb-12">
+        <div className="w-32 h-32 rounded-full bg-white mb-4 mx-auto overflow-hidden">
+          {/* Profile Image or Placeholder */}
+          <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+            {userData.profilePicture ? (
+              <img src={userData.profilePicture} alt={userData.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-gray-600 text-2xl">{getInitials(userData.name)}</span>
+            )}
           </div>
         </div>
+        <h1 className="text-2xl font-bold text-center mb-1">{userData.name}</h1>
+        <p className="text-center opacity-90">
+          {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
+        </p>
+      </div>
+      
+      <div className="space-y-8">
+        <section>
+          <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+            Contact
+          </h2>
+          <div className="space-y-2">
+            <p>{userData.email}</p>
+            {userData.linkedIn && <p>{userData.linkedIn}</p>}
+            {userData.github && <p>{userData.github}</p>}
+          </div>
+        </section>
         
-        {/* Main Content */}
-        <div className="w-2/3 p-8 bg-white">
+        {userData.skills && userData.skills.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+              Skills
+            </h2>
+            <div className="space-y-1">
+              {userData.skills.map((skill, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="w-24">{skill.name}</div>
+                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
+                    <div 
+                      className="bg-white h-2 rounded-full" 
+                      style={{ 
+                        width: skill.level === "Beginner" ? "33%" : 
+                               skill.level === "Intermediate" ? "66%" : "90%" 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+        
+        {userData.hobbies && userData.hobbies.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+              Hobbies
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {userData.hobbies.map((hobby, index) => (
+                <span 
+                  key={index}
+                  className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm"
+                >
+                  {hobby}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {userData.languages && userData.languages.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+              Languages
+            </h2>
+            <div className="space-y-1">
+              {userData.languages.map((lang, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="w-24">{lang.language}</div>
+                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
+                    <div 
+                      className="bg-white h-2 rounded-full" 
+                      style={{ 
+                        width: lang.proficiency === "Beginner" ? "33%" : 
+                               lang.proficiency === "Intermediate" ? "66%" : "90%" 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  );
+  
+  // Render main content
+  const renderContent = (pageContent: any[]) => {
+    return (
+      <div className="w-2/3 p-8 bg-white">
+        {/* About Me Section */}
+        {pageContent.some(section => section.type === 'aboutMe') && userData.aboutMe && (
           <section className="mb-8">
             <h2 
               className="text-2xl font-bold mb-4 pb-2 border-b-2" 
@@ -407,12 +858,12 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
             >
               About Me
             </h2>
-            <p className="text-gray-700">
-              Creative and detail-oriented Software Engineer with 8+ years of experience
-              developing innovative solutions. Passionate about clean code and user-centered design.
-            </p>
+            <p className="text-gray-700">{userData.aboutMe}</p>
           </section>
-          
+        )}
+        
+        {/* Experience Section */}
+        {pageContent.some(section => section.type === 'experience') && userData.experience && userData.experience.length > 0 && (
           <section className="mb-8">
             <h2 
               className="text-2xl font-bold mb-4 pb-2 border-b-2" 
@@ -421,48 +872,181 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
               Experience
             </h2>
             <div className="space-y-4">
-              <div>
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold">Senior Software Engineer</h3>
-                  <span className="text-sm text-gray-500">2020 - Present</span>
-                </div>
-                <p className="text-gray-600 italic mb-2">Tech Corp, San Francisco</p>
-                <ul className="list-disc ml-4 text-gray-700">
-                  <li>Led frontend development for flagship product</li>
-                  <li>Improved app performance by 40% through code optimization</li>
-                </ul>
-              </div>
+              {pageContent
+                .filter(section => section.type === 'experience')
+                .map(section => {
+                  const exp = userData.experience[section.index];
+                  return (
+                    <div key={section.index}>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold">{exp.jobTitle}</h3>
+                        <span className="text-sm text-gray-500">
+                          {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+                        </span>
+                      </div>
+                      <p className="text-gray-600 italic mb-2">{exp.company}</p>
+                      <ul className="list-disc ml-4 text-gray-700">
+                        <li>{exp.description}</li>
+                      </ul>
+                    </div>
+                  );
+                })}
             </div>
           </section>
-          
-          <section>
+        )}
+        
+        {/* Education Section */}
+        {pageContent.some(section => section.type === 'education') && userData.education && userData.education.length > 0 && (
+          <section className="mb-8">
             <h2 
               className="text-2xl font-bold mb-4 pb-2 border-b-2" 
               style={{ borderColor: primaryColor, color: primaryColor }}
             >
               Education
             </h2>
-            <div>
-              <div className="flex justify-between items-center">
-                <h3 className="font-bold">B.S. Computer Science</h3>
-                <span className="text-sm text-gray-500">2016 - 2020</span>
-              </div>
-              <p className="text-gray-600 italic">University of California, Berkeley</p>
+            {pageContent
+              .filter(section => section.type === 'education')
+              .map(section => {
+                const edu = userData.education[section.index];
+                return (
+                  <div key={section.index}>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-bold">{edu.degree}</h3>
+                      <span className="text-sm text-gray-500">{edu.year_of_start} - {edu.year_of_completion}</span>
+                    </div>
+                    <p className="text-gray-600 italic">{edu.institution}</p>
+                  </div>
+                );
+              })}
+          </section>
+        )}
+
+        {/* Projects Section */}
+        {pageContent.some(section => section.type === 'project') && userData.projects && userData.projects.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-2xl font-bold mb-4 pb-2 border-b-2" 
+              style={{ borderColor: primaryColor, color: primaryColor }}
+            >
+              Projects
+            </h2>
+            <div className="space-y-4">
+              {pageContent
+                .filter(section => section.type === 'project')
+                .map(section => {
+                  const project = userData.projects[section.index];
+                  return (
+                    <div key={section.index}>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold">{project.name}</h3>
+                        <span className="text-sm text-gray-500">
+                          {formatDate(project.startDate)} - {formatDate(project.endDate)}
+                        </span>
+                      </div>
+                      <p className="text-gray-600 italic mb-2">{project.techStack}</p>
+                      <p className="text-gray-700">{project.description}</p>
+                      {project.link && (
+                        <p className="text-sm mt-1">
+                          <a 
+                            href={project.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ color: primaryColor }}
+                          >
+                            View Project
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
             </div>
           </section>
-        </div>
+        )}
       </div>
+    );
+  };
+  
+  return (
+    <div className={containerClass}>
+      {pages.map((page, pageIndex) => (
+        <div 
+          key={pageIndex}
+          className="relative mx-auto bg-white shadow-lg mb-8"
+          style={{ 
+            width: `${A4_WIDTH}px`, 
+            height: `${A4_HEIGHT}px`,
+            breakAfter: 'page',
+            breakInside: 'avoid',
+            overflow: 'hidden'
+          }}
+        >
+          <div className="flex h-full">
+            {renderSidebar()}
+            {renderContent(page.content)}
+          </div>
+          
+          {/* Page number */}
+          {pages.length > 1 && (
+            <div className="absolute bottom-4 right-4 text-sm text-gray-500">
+              Page {pageIndex + 1} of {pages.length}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
 
-// 4. Minimalist Technical Template (New)
+
+// 4. Minimalist Technical Template
 const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
+  userData
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
+  
+  if (!userData) {
+    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+  }
+
+  // Group skills by type
+  const groupedSkills: {
+    Languages: string[];
+    Frameworks: string[];
+    Tools: string[];
+    Databases: string[];
+  } = {
+    Languages: [],
+    Frameworks: [],
+    Tools: [],
+    Databases: []
+  };
+
+  if (userData.skills && userData.skills.length > 0) {
+    userData.skills.forEach(skill => {
+      if (skill.name.toLowerCase().includes('python') || 
+          skill.name.toLowerCase().includes('java') || 
+          skill.name.toLowerCase().includes('script')) {
+        groupedSkills.Languages.push(skill.name);
+      } else if (skill.name.toLowerCase().includes('react') || 
+                skill.name.toLowerCase().includes('node') || 
+                skill.name.toLowerCase().includes('framework')) {
+        groupedSkills.Frameworks.push(skill.name);
+      } else if (skill.name.toLowerCase().includes('git') || 
+                skill.name.toLowerCase().includes('docker')) {
+        groupedSkills.Tools.push(skill.name);
+      } else if (skill.name.toLowerCase().includes('sql') || 
+                skill.name.toLowerCase().includes('mongo')) {
+        groupedSkills.Databases.push(skill.name);
+      } else {
+        // Default to Tools category
+        groupedSkills.Tools.push(skill.name);
+      }
+    });
+  }
   
   return (
     <div className={containerClass}>
@@ -473,15 +1057,21 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
             className="text-4xl font-bold mb-2" 
             style={{ color: primaryColor }}
           >
-            JOHN SMITH
+            {userData.name.toUpperCase()}
           </h1>
-          <p className="text-xl mb-4">Software Engineer</p>
+          <p className="text-xl mb-4">
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Software Engineer"}
+          </p>
           <div className="flex justify-center space-x-4 text-sm text-gray-600">
-            <span>john.smith@email.com</span>
+            <span>{userData.email}</span>
             <span>•</span>
-            <span>(555) 123-4567</span>
-            <span>•</span>
-            <span>San Francisco, CA</span>
+            {userData.linkedIn && (
+              <>
+                <span>{userData.linkedIn}</span>
+                <span>•</span>
+              </>
+            )}
+            {userData.github && <span>{userData.github}</span>}
           </div>
         </header>
         
@@ -494,543 +1084,536 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
             Technical Skills
           </h2>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h3 className="font-semibold mb-2">Languages</h3>
-              <p className="text-gray-700">JavaScript, TypeScript, Python, SQL</p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Frameworks</h3>
-              <p className="text-gray-700">React, Node.js, Express, Next.js</p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Tools</h3>
-              <p className="text-gray-700">Git, Docker, AWS, CI/CD</p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Databases</h3>
-              <p className="text-gray-700">MongoDB, PostgreSQL, Redis</p>
-            </div>
+            {Object.entries(groupedSkills).map(([category, skills]) => (
+              skills.length > 0 && (
+                <div key={category}>
+                  <h3 className="font-semibold mb-2">{category}</h3>
+                  <p className="text-gray-700">{skills.join(', ')}</p>
+                </div>
+              )
+            ))}
           </div>
         </section>
         
         {/* Experience */}
-        <section className="mb-8">
-          <h2 
-            className="text-lg font-bold mb-4 uppercase tracking-wider"
-            style={{ color: primaryColor }}
-          >
-            Experience
-          </h2>
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold">Senior Software Engineer</h3>
-                <span>2020 - Present</span>
-              </div>
-              <p className="text-gray-600 mb-2">Tech Corp, San Francisco, CA</p>
-              <ul className="list-disc ml-4 text-gray-700">
-                <li>Designed and implemented microservice architecture using Node.js and Docker</li>
-                <li>Led team of 5 engineers in development of real-time data processing pipeline</li>
-                <li>Reduced API response time by 60% through code optimization and caching strategies</li>
-              </ul>
+        {userData.experience && userData.experience.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-lg font-bold mb-4 uppercase tracking-wider"
+              style={{ color: primaryColor }}
+            >
+              Experience
+            </h2>
+            <div className="space-y-6">
+              {userData.experience.map((exp, index) => (
+                <div key={index}>
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold">{exp.jobTitle}</h3>
+                    <span>{formatDate(exp.startDate)} - {formatDate(exp.endDate)}</span>
+                  </div>
+                  <p className="text-gray-600 mb-2">{exp.company}</p>
+                  <ul className="list-disc ml-4 text-gray-700">
+                    <li>{exp.description}</li>
+                  </ul>
+                </div>
+              ))}
             </div>
-          </div>
-        </section>
+          </section>
+        )}
         
         {/* Projects */}
-        <section className="mb-8">
-          <h2 
-            className="text-lg font-bold mb-4 uppercase tracking-wider"
-            style={{ color: primaryColor }}
-          >
-            Technical Projects
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold">Data Visualization Dashboard</h3>
-              <p className="text-gray-700 mb-2">
-                React, D3.js, Express, MongoDB
-              </p>
-              <p className="text-gray-700">
-                Developed interactive dashboard for visualizing complex datasets with real-time filtering capabilities.
-              </p>
+        {userData.projects && userData.projects.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-lg font-bold mb-4 uppercase tracking-wider"
+              style={{ color: primaryColor }}
+            >
+              Technical Projects
+            </h2>
+            <div className="space-y-4">
+              {userData.projects.map((project, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold">{project.name}</h3>
+                  <p className="text-gray-700 mb-2">
+                    {project.techStack}
+                  </p>
+                  <p className="text-gray-700">
+                    {project.description}
+                  </p>
+                </div>
+              ))}
             </div>
-            <div>
-              <h3 className="font-semibold">Distributed Task Queue</h3>
-              <p className="text-gray-700 mb-2">
-                Python, Redis, Docker
-              </p>
-              <p className="text-gray-700">
-                Created scalable distributed task queue system with fault tolerance and automatic retries.
-              </p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
         
         {/* Education */}
-        <section>
-          <h2 
-            className="text-lg font-bold mb-4 uppercase tracking-wider"
-            style={{ color: primaryColor }}
-          >
-            Education
-          </h2>
-          <div>
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold">B.S. Computer Science</h3>
-              <span>2016 - 2020</span>
-            </div>
-            <p className="text-gray-600">University of California, Berkeley</p>
-          </div>
-        </section>
+        {userData.education && userData.education.length > 0 && (
+          <section>
+            <h2 
+              className="text-lg font-bold mb-4 uppercase tracking-wider"
+              style={{ color: primaryColor }}
+            >
+              Education
+            </h2>
+            {userData.education.map((edu, index) => (
+              <div key={index}>
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold">{edu.degree}</h3>
+                  <span>{edu.year_of_start} - {edu.year_of_completion}</span>
+                </div>
+                <p className="text-gray-600">{edu.institution}</p>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* Certifications */}
+        {userData.certifications && userData.certifications.length > 0 && (
+          <section className="mt-8">
+            <h2 
+              className="text-lg font-bold mb-4 uppercase tracking-wider"
+              style={{ color: primaryColor }}
+            >
+              Certifications
+            </h2>
+            {userData.certifications.map((cert, index) => (
+              <div key={index} className="mb-2">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold">{cert.name}</h3>
+                  <span>{cert.year}</span>
+                </div>
+                <p className="text-gray-600">{cert.organization}</p>
+              </div>
+            ))}
+          </section>
+        )}
       </div>
     </div>
   );
 };
 
-// 5. Academic CV Template (New)
+// 5. Academic CV Template
 const AcademicCV: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
+  userData
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
+  
+  if (!userData) {
+    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+  }
   
   return (
     <div className={containerClass}>
       <div className="p-8">
         {/* Header */}
         <header className="mb-8 pb-4 border-b-2" style={{ borderColor: primaryColor }}>
-          <h1 className="text-3xl font-bold mb-2">John Smith, Ph.D.</h1>
-          <p className="text-gray-700 mb-4">Associate Professor of Computer Science</p>
+          <h1 className="text-3xl font-bold mb-2">{userData.name}</h1>
+          <p className="text-gray-700 mb-4">
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Academic Professional"}
+          </p>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <p>Department of Computer Science</p>
-              <p>University of Technology</p>
-              <p>San Francisco, CA 94105</p>
+              {userData.education && userData.education.length > 0 && (
+                <p>{userData.education[0].institution}</p>
+              )}
+              <p>Email: {userData.email}</p>
             </div>
             <div>
-              <p>Email: john.smith@university.edu</p>
-              <p>Phone: (555) 123-4567</p>
-              <p>Website: www.jsmith-academic.edu</p>
+              {userData.linkedIn && <p>LinkedIn: {userData.linkedIn}</p>}
+              {userData.github && <p>GitHub: {userData.github}</p>}
             </div>
           </div>
         </header>
         
         {/* Education */}
-        <section className="mb-6">
-          <h2 
-            className="text-xl font-bold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Education
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between">
-                <p className="font-semibold">Ph.D. in Computer Science</p>
-                <p>2015-2019</p>
-              </div>
-              <p className="italic">Stanford University, Stanford, CA</p>
-              <p className="text-sm">Dissertation: Machine Learning Approaches for Natural Language Understanding</p>
-              <p className="text-sm">Advisor: Prof. Jane Doe</p>
+        {userData.education && userData.education.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-2xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Education
+            </h2>
+            <div className="space-y-6">
+              {userData.education.map((edu, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold">{edu.degree}</h3>
+                  <p className="italic">{edu.institution}, {edu.year_of_start} - {edu.year_of_completion}</p>
+                </div>
+              ))}
             </div>
-            <div>
-              <div className="flex justify-between">
-                <p className="font-semibold">M.S. in Computer Science</p>
-                <p>2013-2015</p>
-              </div>
-              <p className="italic">Massachusetts Institute of Technology, Cambridge, MA</p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
         
-        {/* Publications */}
-        <section className="mb-6">
-          <h2 
-            className="text-xl font-bold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Selected Publications
-          </h2>
-          <div className="space-y-3 text-sm">
-            <p>
-              <strong>Smith, J.</strong>, Jones, A., & Brown, B. (2023). Advances in Natural Language Processing for Technical Documentation. 
-              <em>Journal of Artificial Intelligence Research</em>, 68, 112-145.
-            </p>
-            <p>
-              <strong>Smith, J.</strong>, & Anderson, C. (2022). Transformer-based Approaches to Code Generation.
-              <em>Proceedings of the International Conference on Software Engineering</em>, 234-248.
-            </p>
-            <p>
-              Lee, M., <strong>Smith, J.</strong>, & Wilson, D. (2021). Semantic Analysis of Programming Languages.
-              <em>ACM Transactions on Programming Languages and Systems</em>, 43(2), 15:1-15:32.
-            </p>
-          </div>
-        </section>
+        {/* Research Experience */}
+        {userData.experience && userData.experience.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-2xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Research Experience
+            </h2>
+            <div className="space-y-6">
+              {userData.experience.map((exp, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold">{exp.jobTitle}</h3>
+                  <p className="italic">{exp.company}, {formatDate(exp.startDate)} - {formatDate(exp.endDate)}</p>
+                  <ul className="list-disc ml-4 mt-2 text-gray-700">
+                    <li>{exp.description}</li>
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         
-        {/* Teaching */}
-        <section className="mb-6">
-          <h2 
-            className="text-xl font-bold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Teaching Experience
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between">
-                <p className="font-semibold">Associate Professor</p>
-                <p>2022-Present</p>
-              </div>
-              <p className="italic">University of Technology, San Francisco, CA</p>
-              <ul className="list-disc ml-4 text-sm">
-                <li>CS401: Advanced Algorithms</li>
-                <li>CS510: Natural Language Processing</li>
-                <li>CS655: Graduate Research Methods</li>
-              </ul>
+        {/* Publications/Projects */}
+        {userData.projects && userData.projects.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-2xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Publications & Projects
+            </h2>
+            <div className="space-y-4">
+              {userData.projects.map((project, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold">{project.name}</h3>
+                  <p className="italic">{formatDate(project.startDate)} - {formatDate(project.endDate)}</p>
+                  <p className="mt-1 text-gray-700">{project.description}</p>
+                  {project.link && (
+                    <p>
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: primaryColor }}
+                      >
+                        Link to publication
+                      </a>
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
-            <div>
-              <div className="flex justify-between">
-                <p className="font-semibold">Assistant Professor</p>
-                <p>2019-2022</p>
-              </div>
-              <p className="italic">University of Technology, San Francisco, CA</p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
         
-        {/* Grants and Awards */}
-        <section className="mb-6">
-          <h2 
-            className="text-xl font-bold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Grants and Awards
-          </h2>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <p>National Science Foundation Research Grant</p>
-              <p>2023-2025</p>
+        {/* Skills and Methods */}
+        {userData.skills && userData.skills.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-2xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Research Skills & Methods
+            </h2>
+            <div className="grid grid-cols-2 gap-2">
+              {userData.skills.map((skill, index) => (
+                <p key={index} className="text-gray-700">• {skill.name}</p>
+              ))}
             </div>
-            <div className="flex justify-between">
-              <p>University Excellence in Teaching Award</p>
-              <p>2022</p>
-            </div>
-            <div className="flex justify-between">
-              <p>ACM SIGAI Outstanding Dissertation Award</p>
-              <p>2020</p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
         
-        {/* Professional Service */}
-        <section>
-          <h2 
-            className="text-xl font-bold mb-4"
-            style={{ color: primaryColor }}
-          >
-            Professional Service
-          </h2>
-          <div className="space-y-2 text-sm">
-            <p>Program Committee Member, International Conference on Artificial Intelligence, 2021-Present</p>
-            <p>Reviewer, Journal of Machine Learning Research, 2020-Present</p>
-            <p>Faculty Advisor, Computer Science Graduate Student Association, 2021-Present</p>
-          </div>
-        </section>
+        {/* Languages */}
+        {userData.languages && userData.languages.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-2xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Languages
+            </h2>
+            <div className="grid grid-cols-2 gap-2">
+              {userData.languages.map((lang, index) => (
+                <p key={index} className="text-gray-700">• {lang.language}: {lang.proficiency}</p>
+              ))}
+            </div>
+          </section>
+        )}
+        
+        {/* Certifications */}
+        {userData.certifications && userData.certifications.length > 0 && (
+          <section>
+            <h2 
+              className="text-2xl font-semibold mb-4"
+              style={{ color: primaryColor }}
+            >
+              Certifications & Additional Training
+            </h2>
+            <div className="space-y-2">
+              {userData.certifications.map((cert, index) => (
+                <div key={index}>
+                  <p className="font-semibold">{cert.name}</p>
+                  <p className="italic">{cert.organization}, {cert.year}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
 };
 
-// 6. Professional Business Template (New)
-const ProfessionalBusiness: React.FC<BaseTemplateProps> = ({
-  font,
-  primaryColor,
-  preview = false,
-}) => {
-  const containerClass = getA4ContainerClass(font, preview);
+// Main Resume Builder Component with side-by-side layout
+export default function ResumeBuilder() {
+  const [selectedTemplate, setSelectedTemplate] = useState("minimal");
+  const [selectedFont, setSelectedFont] = useState<FontType>("inter");
+  const [primaryColor, setPrimaryColor] = useState("#2563eb"); // Default blue
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { userId } = useAuth();
   
-  return (
-    <div className={containerClass}>
-      <div className="p-8">
-        {/* Header with horizontal rule */}
-        <header className="mb-8">
-          <h1 
-            className="text-3xl font-bold mb-2 text-center" 
-            style={{ color: primaryColor }}
-          >
-            JOHN SMITH
-          </h1>
-          <p className="text-center mb-4 text-gray-600">Marketing Director & Business Strategist</p>
-          <hr className="border-t-2 w-32 mx-auto mb-4" style={{ borderColor: primaryColor }} />
-          <div className="flex justify-center space-x-6 text-sm">
-            <span>john.smith@email.com</span>
-            <span>(555) 123-4567</span>
-            <span>San Francisco, CA</span>
-            <span>linkedin.com/in/johnsmith</span>
-          </div>
-        </header>
-        
-        {/* Professional Profile */}
-        <section className="mb-8">
-          <h2 
-            className="text-lg font-bold mb-3 uppercase"
-            style={{ color: primaryColor }}
-          >
-            Professional Profile
-          </h2>
-          <p className="text-gray-700">
-            Results-driven Marketing Director with over 10 years of experience developing award-winning strategies 
-            for Fortune 500 companies. Expertise in digital transformation, brand development, and integrated 
-            marketing communications. Known for driving revenue growth while optimizing marketing ROI.
-          </p>
-        </section>
-        
-        {/* Key Skills */}
-        <section className="mb-8">
-          <h2 
-            className="text-lg font-bold mb-3 uppercase"
-            style={{ color: primaryColor }}
-          >
-            Core Competencies
-          </h2>
-          <div className="grid grid-cols-3 gap-2 text-sm">
-            <div className="p-2 border rounded text-center">Strategic Planning</div>
-            <div className="p-2 border rounded text-center">Team Leadership</div>
-            <div className="p-2 border rounded text-center">Digital Marketing</div>
-            <div className="p-2 border rounded text-center">Budget Management</div>
-            <div className="p-2 border rounded text-center">Brand Development</div>
-            <div className="p-2 border rounded text-center">Market Analysis</div>
-          </div>
-        </section>
-        
-        {/* Professional Experience */}
-        <section className="mb-8">
-          <h2 
-            className="text-lg font-bold mb-3 uppercase"
-            style={{ color: primaryColor }}
-          >
-            Professional Experience
-          </h2>
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold">Marketing Director</h3>
-                <p className="text-sm">2018 - Present</p>
-              </div>
-              <p className="text-gray-600 italic mb-2">Global Innovations Inc., San Francisco, CA</p>
-              <ul className="list-disc ml-4 text-sm text-gray-700">
-                <li>Developed and executed comprehensive marketing strategies resulting in 35% revenue growth</li>
-                <li>Developed and executed comprehensive marketing strategies resulting in 35% revenue growth</li>
-                <li>Led rebranding initiative that increased brand awareness by 48% and customer engagement by 62%</li>
-                <li>Managed a team of 12 marketing professionals and a $3.5M annual budget</li>
-                <li>Implemented data-driven marketing approach that improved campaign ROI by 40%</li>
-              </ul>
-            </div>
-            <div>
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold">Senior Marketing Manager</h3>
-                <p className="text-sm">2015 - 2018</p>
-              </div>
-              <p className="text-gray-600 italic mb-2">TechSolutions Corp., San Francisco, CA</p>
-              <ul className="list-disc ml-4 text-sm text-gray-700">
-                <li>Spearheaded digital marketing transformation, resulting in 28% growth in online sales</li>
-                <li>Developed strategic partnerships with key industry influencers to expand market reach</li>
-                <li>Optimized marketing spend across channels to achieve 22% reduction in cost per acquisition</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-        
-        {/* Education */}
-        <section className="mb-8">
-          <h2 
-            className="text-lg font-bold mb-3 uppercase"
-            style={{ color: primaryColor }}
-          >
-            Education
-          </h2>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between">
-                <p className="font-semibold">MBA, Marketing & Strategic Management</p>
-                <p className="text-sm">2013 - 2015</p>
-              </div>
-              <p className="text-gray-600 italic">Harvard Business School, Boston, MA</p>
-            </div>
-            <div>
-              <div className="flex justify-between">
-                <p className="font-semibold">B.S. Business Administration</p>
-                <p className="text-sm">2009 - 2013</p>
-              </div>
-              <p className="text-gray-600 italic">University of Pennsylvania, Philadelphia, PA</p>
-            </div>
-          </div>
-        </section>
-        
-        {/* Achievements */}
-        <section>
-          <h2 
-            className="text-lg font-bold mb-3 uppercase"
-            style={{ color: primaryColor }}
-          >
-            Professional Achievements
-          </h2>
-          <ul className="list-disc ml-4 text-sm text-gray-700">
-            <li>AdWeek Marketing Innovator of the Year Award, 2022</li>
-            <li>Led team that won three MarCom Awards for excellence in integrated marketing, 2021</li>
-            <li>Published author in Harvard Business Review on digital marketing strategies</li>
-            <li>Keynote speaker at International Marketing Summit, 2020 & 2022</li>
-          </ul>
-        </section>
-      </div>
-    </div>
-  );
-};
-
-// Template Component and Form
-export default function ResumeTemplates() {
-  const [font, setFont] = useState<FontType>("inter");
-  const [primaryColor, setPrimaryColor] = useState("#3b82f6"); // Default blue
-  const [template, setTemplate] = useState("minimal-classic");
-  
-  // Helper function to get template component
+  // Get template component based on selection
   const getTemplateComponent = () => {
-    switch (template) {
-      case "minimal-classic":
-        return <MinimalClassic font={font} primaryColor={primaryColor} />;
-      case "modern-professional":
-        return <ModernProfessional font={font} primaryColor={primaryColor} />;
-      case "bold-creative":
-        return <BoldCreative font={font} primaryColor={primaryColor} />;
-      case "minimalist-technical":
-        return <MinimalistTechnical font={font} primaryColor={primaryColor} />;
-      case "academic-cv":
-        return <AcademicCV font={font} primaryColor={primaryColor} />;
-      case "professional-business":
-        return <ProfessionalBusiness font={font} primaryColor={primaryColor} />;
+    switch (selectedTemplate) {
+      case "minimal":
+        return <MinimalClassic font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+      case "modern":
+        return <ModernProfessional font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+      case "bold":
+        return <BoldCreative font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+      case "academic": 
+        return <AcademicCV font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+      case "technical": 
+        return <MinimalistTechnical font={selectedFont} primaryColor={primaryColor} userData={userData} />;
       default:
-        return <MinimalClassic font={font} primaryColor={primaryColor} />;
-    }
-  };
-  
-  // Helper function to get template preview
-  const getTemplatePreview = () => {
-    switch (template) {
-      case "minimal-classic":
-        return <MinimalClassic font={font} primaryColor={primaryColor} preview={true} />;
-      case "modern-professional":
-        return <ModernProfessional font={font} primaryColor={primaryColor} preview={true} />;
-      case "bold-creative":
-        return <BoldCreative font={font} primaryColor={primaryColor} preview={true} />;
-      case "minimalist-technical":
-        return <MinimalistTechnical font={font} primaryColor={primaryColor} preview={true} />;
-      case "academic-cv":
-        return <AcademicCV font={font} primaryColor={primaryColor} preview={true} />;
-      case "professional-business":
-        return <ProfessionalBusiness font={font} primaryColor={primaryColor} preview={true} />;
-      default:
-        return <MinimalClassic font={font} primaryColor={primaryColor} preview={true} />;
+        return <BoldCreative font={selectedFont} primaryColor={primaryColor} userData={userData} />;
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center py-6">Resume Builder</h1>
+  // Fetch user data when component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setIsLoading(true);
+      try {
+        // Get user ID from Clerk
+        if (!userId) {
+          console.log("No user ID available yet");
+          return;
+        }
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Panel: Template Selection */}
-          <Card className="lg:col-span-1">
+        // Fetch data from the specified API endpoint
+        const response = await fetch(`http://localhost:8000/api/resume?user_id=${userId }`);
+        
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setUserData(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        
+        // Fallback to mock data if API request fails
+        const mockData: UserData = {
+          name: "Jane Doe",
+          email: "jane.doe@example.com",
+          profilePicture: "",
+          aboutMe: "Driven software engineer with 5+ years of experience in web development. Passionate about creating clean, efficient code and solving complex problems.",
+          linkedIn: "linkedin.com/in/janedoe",
+          github: "github.com/janedoe",
+          education: [
+            {
+              degree: "BSc in Computer Science",
+              institution: "University of Technology",
+              year_of_start: "2015",
+              year_of_completion: "2019"
+            }
+          ],
+          experience: [
+            {
+              jobTitle: "Senior Frontend Developer",
+              company: "Tech Solutions Inc.",
+              startDate: "01-06-2021",
+              endDate: "Present",
+              description: "Led a team of 5 developers in building a SaaS platform that increased client retention by 25%."
+            },
+            {
+              jobTitle: "Frontend Developer",
+              company: "Digital Innovations",
+              startDate: "01-04-2019",
+              endDate: "31-05-2021",
+              description: "Developed responsive web applications using React and Next.js."
+            }
+          ],
+          projects: [
+            {
+              name: "E-commerce Platform",
+              description: "Built a scalable e-commerce platform with React, Node.js, and MongoDB.",
+              startDate: "01-01-2020",
+              endDate: "01-06-2020",
+              techStack: "React, Node.js, MongoDB",
+              link: "github.com/janedoe/ecommerce"
+            }
+          ],
+          certifications: [
+            {
+              name: "AWS Certified Developer",
+              organization: "Amazon Web Services",
+              year: "2021",
+              credentialId: "AWS-DEV-12345",
+              credentialUrl: "aws.amazon.com/certification"
+            }
+          ],
+          skills: [
+            {
+              skill: "frontend",
+              name: "React",
+              level: "Expert"
+            },
+            {
+              skill: "frontend",
+              name: "JavaScript",
+              level: "Expert"
+            },
+            {
+              skill: "backend",
+              name: "Node.js",
+              level: "Intermediate"
+            }
+          ],
+          languages: [
+            {
+              language: "English",
+              proficiency: "Native"
+            },
+            {
+              language: "Spanish",
+              proficiency: "Intermediate"
+            }
+          ],
+          hobbies: ["Hiking", "Photography", "Coding"],
+          aspiringRoles: ["Senior Frontend Developer", "Tech Lead"],
+          aspiringCompanies: ["Google", "Microsoft", "Airbnb"]
+        };
+        
+        setUserData(mockData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, [userId]);
+
+  return (
+    <div className="container mx-auto py-8 max-w-7xl">
+      <h1 className="text-3xl font-bold mb-6"></h1>
+      
+      {/* Side-by-side layout */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Left column - Styling options */}
+        <div className="md:col-span-1">
+          <Card className="h-full">
             <CardHeader>
-              <CardTitle>Template Options</CardTitle>
+              <CardTitle>Customize Your Resume</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <Tabs defaultValue="template" className="w-full">
-                <TabsList className="grid grid-cols-2 mb-4">
-                  <TabsTrigger value="template">Template</TabsTrigger>
-                  <TabsTrigger value="styling">Styling</TabsTrigger>
-                </TabsList>
-                <TabsContent value="template" className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium">Choose Template</label>
-                    <Select
-                      value={template}
-                      onValueChange={(value) => setTemplate(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select template" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="minimal-classic">Minimal Classic</SelectItem>
-                        <SelectItem value="modern-professional">Modern Professional</SelectItem>
-                        <SelectItem value="bold-creative">Bold Creative</SelectItem>
-                        <SelectItem value="minimalist-technical">Minimalist Technical</SelectItem>
-                        <SelectItem value="academic-cv">Academic CV</SelectItem>
-                        <SelectItem value="professional-business">Professional Business</SelectItem>
-                      </SelectContent>
-                    </Select>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Template Selection */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Template
+                  </label>
+                  <Select
+                    value={selectedTemplate}
+                    onValueChange={setSelectedTemplate}
+                    defaultOpen={false}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select template" />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="minimal">Minimal Classic</SelectItem>
+                      <SelectItem value="modern">Modern Professional</SelectItem>
+                      <SelectItem value="bold">Bold Creative</SelectItem>
+                      <SelectItem value="academic">Academic CV</SelectItem>
+                      <SelectItem value="technical">Minimalist Technical</SelectItem>
+                      {/* You can add the other templates here */}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Font Selection */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Font
+                  </label>
+                  <Select
+                    value={selectedFont}
+                    onValueChange={(value) => setSelectedFont(value as FontType)}
+                    defaultOpen={false}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select font" />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="inter">Inter</SelectItem>
+                      <SelectItem value="roboto">Roboto</SelectItem>
+                      <SelectItem value="opensans">Open Sans</SelectItem>
+                      <SelectItem value="lato">Lato</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Color Selection */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Primary Color
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      className="w-12 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      className="flex-1"
+                    />
                   </div>
-                  <div className="border rounded-md p-2 h-[600px] overflow-hidden flex items-start justify-center">
-                  <div className="transform scale-[0.3] origin-top">
-                    {getTemplatePreview()}
-                    </div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="styling" className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium">Font</label>
-                    <Select
-                      value={font}
-                      onValueChange={(value) => setFont(value as FontType)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select font" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="inter">Inter</SelectItem>
-                        <SelectItem value="roboto">Roboto</SelectItem>
-                        <SelectItem value="opensans">Open Sans</SelectItem>
-                        <SelectItem value="lato">Lato</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium">Primary Color</label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={primaryColor}
-                        onChange={(e) => setPrimaryColor(e.target.value)}
-                        className="w-12 h-10 p-1"
-                      />
-                      <Input 
-                        type="text" 
-                        value={primaryColor}
-                        onChange={(e) => setPrimaryColor(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                </div>
+                
+                {/* Export Button */}
+                <Button className="w-full mt-8">
+                  <Eye className="w-4 h-4 mr-2" />
+                  Export as PDF
+                </Button>
+              </div>
             </CardContent>
           </Card>
-          
-          {/* Right Panel: Preview */}
-          <Card className="lg:col-span-2 overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Preview</CardTitle>
-              <Button size="sm" variant="outline">
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
+        </div>
+        
+        {/* Right column - Preview */}
+        <div className="md:col-span-2">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Resume Preview</CardTitle>
             </CardHeader>
-            <CardContent className="relative h-[80vh] overflow-auto bg-gray-100 p-0">
-              <div className="p-8 flex justify-center">
-                {getTemplateComponent()}
-              </div>
+            <CardContent className="overflow-auto max-h-[800px]">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p>Loading your data...</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  {getTemplateComponent()}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

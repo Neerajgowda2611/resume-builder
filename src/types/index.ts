@@ -42,20 +42,6 @@ export interface Skill {
   level: string;
 }
 
-// export interface ResumeData {
-//   name: string;
-//   email: string;
-//   profilePicture: string;
-//   education: Education[];
-//   experience: Experience[];
-//   certifications: Certification[];
-//   skills: Skill[];
-//   hobbies: string[];
-//   interests: string[];
-// }
-
-
-
 export interface ResumeData {
   name: string;
   email: string;
