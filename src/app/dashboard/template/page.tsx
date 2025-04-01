@@ -90,7 +90,7 @@ interface BaseTemplateProps {
 // Helper function to format date
 const formatDate = (dateString: string) => {
   if (!dateString) return "";
-  
+
   try {
     const [day, month, year] = dateString.split("-");
     return `${month}/${year}`;
@@ -106,7 +106,7 @@ const getA4ContainerClass = (font: FontType, preview: boolean) => {
     // A4 dimensions: 210mm x 297mm - but when preview, scale down
     preview
       ? "scale-[0.7] origin-top-left w-[210mm]"
-      : "min-h-[297mm] w-[210mm] mx-auto shadow-lg", 
+      : "min-h-[297mm] w-[210mm] mx-auto shadow-lg",
     font === "inter" && "font-inter",
     font === "roboto" && "font-roboto",
     font === "opensans" && "font-opensans",
@@ -119,13 +119,17 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
-  userData
+  userData,
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
-  
+
   // If userData is not yet loaded, show loading placeholder
   if (!userData) {
-    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+    return (
+      <div className={containerClass}>
+        <div className="p-8">Loading...</div>
+      </div>
+    );
   }
 
   return (
@@ -135,8 +139,14 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
           {userData.name}
         </h1>
         <div className="text-gray-600 space-y-1">
-          <p>{userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}</p>
-          <p>{userData.email} • {userData.linkedIn}</p>
+          <p>
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0
+              ? userData.aspiringRoles[0]
+              : "Professional"}
+          </p>
+          <p>
+            {userData.email} • {userData.linkedIn}
+          </p>
         </div>
       </header>
 
@@ -149,9 +159,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
             >
               Professional Summary
             </h2>
-            <p className="text-gray-700">
-              {userData.aboutMe}
-            </p>
+            <p className="text-gray-700">{userData.aboutMe}</p>
           </section>
         )}
 
@@ -170,7 +178,10 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
                     {exp.jobTitle} - {exp.company}
                   </h3>
                   <p className="text-gray-600">
-                    {formatDate(exp.startDate)} - {exp.endDate === "Present" ? "Present" : formatDate(exp.endDate)}
+                    {formatDate(exp.startDate)} -{" "}
+                    {exp.endDate === "Present"
+                      ? "Present"
+                      : formatDate(exp.endDate)}
                   </p>
                   <ul className="list-disc ml-4 mt-2 text-gray-700">
                     <li>{exp.description}</li>
@@ -193,7 +204,9 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               {userData.education.map((edu, index) => (
                 <div key={index}>
                   <h3 className="font-semibold">{edu.institution}</h3>
-                  <p className="text-gray-600">{edu.year_of_start} - {edu.year_of_completion}</p>
+                  <p className="text-gray-600">
+                    {edu.year_of_start} - {edu.year_of_completion}
+                  </p>
                   <ul className="list-disc ml-4 mt-2 text-gray-700">
                     <li>{edu.degree}</li>
                   </ul>
@@ -262,14 +275,18 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
-  userData
+  userData,
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
-  
+
   if (!userData) {
-    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+    return (
+      <div className={containerClass}>
+        <div className="p-8">Loading...</div>
+      </div>
+    );
   }
-  
+
   return (
     <div className={containerClass}>
       {/* Header with primary color */}
@@ -279,7 +296,9 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
         <div className="col-span-2">
           <h1 className="text-4xl font-bold mb-2">{userData.name}</h1>
           <p className="text-xl text-gray-600 mb-6">
-            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0
+              ? userData.aspiringRoles[0]
+              : "Professional"}
           </p>
 
           {/* About Me */}
@@ -309,7 +328,8 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
                   <div key={index}>
                     <h3 className="font-semibold">{exp.company}</h3>
                     <p className="text-gray-600 mb-2">
-                      {exp.jobTitle} • {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+                      {exp.jobTitle} • {formatDate(exp.startDate)} -{" "}
+                      {formatDate(exp.endDate)}
                     </p>
                     <ul className="list-disc ml-4 text-gray-700">
                       <li>{exp.description}</li>
@@ -333,7 +353,8 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
                 <div key={index}>
                   <h3 className="font-semibold">{edu.institution}</h3>
                   <p className="text-gray-600 mb-2">
-                    {edu.degree} <br />• {edu.year_of_start} - {edu.year_of_completion}
+                    {edu.degree} <br />• {edu.year_of_start} -{" "}
+                    {edu.year_of_completion}
                   </p>
                 </div>
               ))}
@@ -352,12 +373,41 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
               Contact
             </h2>
             <div className="space-y-2 text-gray-700">
-              <p>{userData.email}</p>
-              {userData.linkedIn && <p>{userData.linkedIn}</p>}
-              {userData.github && <p>{userData.github}</p>}
+              <p>
+                <a
+                  href={`mailto:${userData.email}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {userData.email}
+                </a>
+              </p>
+              {userData.linkedIn && (
+                <p>
+                  <a
+                    href={userData.linkedIn}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    LinkedIn
+                  </a>
+                </p>
+              )}
+              {userData.github && (
+                <p>
+                  <a
+                    href={userData.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    GitHub
+                  </a>
+                </p>
+              )}
             </div>
           </section>
-          
+
           {/* Skills */}
           {userData.skills && userData.skills.length > 0 && (
             <section>
@@ -383,7 +433,7 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
               </div>
             </section>
           )}
-          
+
           {/* Hobbies */}
           {userData.hobbies && userData.hobbies.length > 0 && (
             <section>
@@ -412,7 +462,9 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
               </h2>
               <ul className="list-disc ml-4 text-gray-700">
                 {userData.languages.map((lang, index) => (
-                  <li key={index}>{lang.language} - {lang.proficiency}</li>
+                  <li key={index}>
+                    {lang.language} - {lang.proficiency}
+                  </li>
                 ))}
               </ul>
             </section>
@@ -427,113 +479,187 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
-  userData
+  userData,
 }) => {
   // Define A4 dimensions in pixels (at 96 DPI)
   // A4: 210mm × 297mm ≈ 793px × 1123px
   const A4_WIDTH = 793;
   const A4_HEIGHT = 1123;
-  
+
   // State to track pagination
   const [pages, setPages] = React.useState<any[]>([]);
-  
+
   // Function to split content across pages
   React.useEffect(() => {
     if (!userData) return;
-    
+
     // Determine how to split content
     const contentSections = [];
-    
+
     // Add sections in order of importance
     if (userData.aboutMe) {
-      contentSections.push({ type: 'aboutMe', height: 150 });
+      contentSections.push({ type: "aboutMe", height: 150 });
     }
-    
+
     if (userData.experience && userData.experience.length > 0) {
-      // Estimate 120px per experience entry
+      // Add each experience item individually
       userData.experience.forEach((exp, index) => {
-        contentSections.push({ type: 'experience', index, height: 120 });
+        contentSections.push({
+          type: "experience",
+          index,
+          height: 120,
+          title: exp.jobTitle,
+          content: exp,
+        });
       });
     }
-    
+
     if (userData.education && userData.education.length > 0) {
-      // Estimate 80px per education entry
+      // Add each education item individually
       userData.education.forEach((edu, index) => {
-        contentSections.push({ type: 'education', index, height: 80 });
+        contentSections.push({
+          type: "education",
+          index,
+          height: 80,
+          title: edu.degree,
+          content: edu,
+        });
       });
     }
-    
+
     if (userData.projects && userData.projects.length > 0) {
-      // Estimate 150px per project entry
+      // Add each project item individually
       userData.projects.forEach((project, index) => {
-        contentSections.push({ type: 'project', index, height: 150 });
+        contentSections.push({
+          type: "project",
+          index,
+          height: 150,
+          title: project.name,
+          content: project,
+        });
       });
     }
-    
+
     // Create pages by distributing content
     const newPages = [];
-    let currentPage: any = { content: [] };
+    let currentPage: Page = {
+      content: [],
+      sectionTypes: new Set(), // Track section types on this page
+    };
     let currentHeight = 0;
-    
-    // Header height (About Me title etc.)
-    const HEADER_HEIGHT = 80;
+
+    // Header height for each section type
+    const SECTION_HEADER_HEIGHT = 60;
+    // Content margin
+    const CONTENT_MARGIN = 20;
     // Maximum content height per page (accounting for margins)
     const MAX_CONTENT_HEIGHT = A4_HEIGHT - 120;
-    
+
+    // Add a section to the current page
+    interface Section {
+      type: string;
+      index?: number;
+      height: number;
+      title?: string;
+      content?: any;
+    }
+
+    interface Page {
+      content: Section[];
+      sectionTypes: Set<string>;
+    }
+
+    const addSectionToPage = (section: Section): void => {
+      currentPage.content.push(section);
+
+      // If this is a new section type, add the header height
+      if (!currentPage.sectionTypes.has(section.type)) {
+        currentPage.sectionTypes.add(section.type);
+        currentHeight += SECTION_HEADER_HEIGHT;
+      }
+
+      currentHeight += section.height + CONTENT_MARGIN;
+    };
+
+    // Create a new page
+    const startNewPage = () => {
+      if (currentPage.content.length > 0) {
+        newPages.push(currentPage);
+      }
+      currentPage = {
+        content: [],
+        sectionTypes: new Set(),
+      };
+      currentHeight = 0;
+    };
+
+    // Process all content sections
     contentSections.forEach((section) => {
       // If adding this section would exceed page height, create a new page
-      if (currentHeight + section.height + (currentPage.content.length > 0 ? HEADER_HEIGHT : 0) > MAX_CONTENT_HEIGHT) {
-        newPages.push(currentPage);
-        currentPage = { content: [] };
-        currentHeight = 0;
+      if (
+        currentHeight +
+          section.height +
+          (currentPage.sectionTypes.has(section.type)
+            ? 0
+            : SECTION_HEADER_HEIGHT) +
+          CONTENT_MARGIN >
+        MAX_CONTENT_HEIGHT
+      ) {
+        startNewPage();
       }
-      
-      currentPage.content.push(section);
-      currentHeight += section.height;
+
+      addSectionToPage(section);
     });
-    
-    // Add the last page
+
+    // Add the last page if it has content
     if (currentPage.content.length > 0) {
       newPages.push(currentPage);
     }
-    
+
     setPages(newPages);
   }, [userData]);
-  
-  const containerClass = `font-${font || 'sans'} ${preview ? '' : 'print:shadow-none'}`;
+
+  const containerClass = `font-${font || "sans"} ${
+    preview ? "" : "print:shadow-none"
+  }`;
 
   if (!userData) {
-    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+    return (
+      <div className={containerClass}>
+        <div className="p-8">Loading...</div>
+      </div>
+    );
   }
-  
+
   // Get user initials for avatar
   const getInitials = (name: string) => {
     if (!name) return "N/A";
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
-  
+
   // Format date function
   const formatDate = (dateString: string) => {
     if (!dateString) return "Present";
     return dateString;
   };
-  
+
   // Render sidebar content - only for the first page
   const renderSidebar = (pageIndex: number) => {
     // For pages after the first one, render an empty sidebar with the same background color
     if (pageIndex > 0) {
       return (
-        <div 
-          className="w-1/3" 
-          style={{ backgroundColor: primaryColor }}
-        ></div>
+        <div className="w-1/3" style={{ backgroundColor: primaryColor }}></div>
       );
     }
-    
+
     // For the first page, render the full sidebar
     return (
-      <div 
-        className="w-1/3 p-8 text-white" 
+      <div
+        className="w-1/3 p-8 text-white"
         style={{ backgroundColor: primaryColor }}
       >
         <div className="mb-12">
@@ -541,20 +667,30 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
             {/* Profile Image or Placeholder */}
             <div className="w-full h-full bg-gray-300 flex items-center justify-center">
               {userData.profilePicture ? (
-                <img src={userData.profilePicture} alt={userData.name} className="w-full h-full object-cover" />
+                <img
+                  src={userData.profilePicture}
+                  alt={userData.name}
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <span className="text-gray-600 text-2xl">{getInitials(userData.name)}</span>
+                <span className="text-gray-600 text-2xl">
+                  {getInitials(userData.name)}
+                </span>
               )}
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-center mb-1">{userData.name}</h1>
+          <h1 className="text-2xl font-bold text-center mb-1">
+            {userData.name}
+          </h1>
           <p className="text-center opacity-90">
-            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0
+              ? userData.aspiringRoles[0]
+              : "Professional"}
           </p>
         </div>
-        
+
         <div className="space-y-8">
-          <section>
+          {/* <section>
             <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
               Contact
             </h2>
@@ -563,8 +699,51 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
               {userData.linkedIn && <p>{userData.linkedIn}</p>}
               {userData.github && <p>{userData.github}</p>}
             </div>
+          </section> */}
+
+          <section>
+            <h2
+              className="text-xl font-semibold mb-4"
+              style={{ color: "whitesmoke" }}
+            >
+              Contact
+            </h2>
+            <div className="space-y-2 text-white">
+              <p>
+                <a
+                  href={`mailto:${userData.email}`}
+                  className="text-white hover:underline"
+                >
+                  {userData.email}
+                </a>
+              </p>
+              {userData.linkedIn && (
+                <p>
+                  <a
+                    href={userData.linkedIn}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white hover:underline"
+                  >
+                    LinkedIn
+                  </a>
+                </p>
+              )}
+              {userData.github && (
+                <p>
+                  <a
+                    href={userData.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white hover:underline"
+                  >
+                    GitHub
+                  </a>
+                </p>
+              )}
+            </div>
           </section>
-          
+
           {userData.skills && userData.skills.length > 0 && (
             <section>
               <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
@@ -575,11 +754,15 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
                   <div key={index} className="flex items-center">
                     <div className="w-24">{skill.name}</div>
                     <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                      <div 
-                        className="bg-white h-2 rounded-full" 
-                        style={{ 
-                          width: skill.level === "Beginner" ? "33%" : 
-                                skill.level === "Intermediate" ? "66%" : "90%" 
+                      <div
+                        className="bg-white h-2 rounded-full"
+                        style={{
+                          width:
+                            skill.level === "Beginner"
+                              ? "33%"
+                              : skill.level === "Intermediate"
+                              ? "66%"
+                              : "90%",
                         }}
                       ></div>
                     </div>
@@ -588,7 +771,7 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
               </div>
             </section>
           )}
-          
+
           {userData.hobbies && userData.hobbies.length > 0 && (
             <section>
               <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
@@ -596,7 +779,7 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
               </h2>
               <div className="flex flex-wrap gap-2">
                 {userData.hobbies.map((hobby, index) => (
-                  <span 
+                  <span
                     key={index}
                     className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm"
                   >
@@ -617,11 +800,15 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
                   <div key={index} className="flex items-center">
                     <div className="w-24">{lang.language}</div>
                     <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                      <div 
-                        className="bg-white h-2 rounded-full" 
-                        style={{ 
-                          width: lang.proficiency === "Beginner" ? "33%" : 
-                                lang.proficiency === "Intermediate" ? "66%" : "90%" 
+                      <div
+                        className="bg-white h-2 rounded-full"
+                        style={{
+                          width:
+                            lang.proficiency === "Beginner"
+                              ? "33%"
+                              : lang.proficiency === "Intermediate"
+                              ? "66%"
+                              : "90%",
                         }}
                       ></div>
                     </div>
@@ -634,16 +821,24 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
       </div>
     );
   };
-  
+
+  // Function to determine if a section type exists on the current page
+  const hasSectionType = (page: { content: any[] }, type: string) => {
+    return page.content.some((section) => section.type === type);
+  };
+
   // Render main content
-  const renderContent = (pageContent: any[]) => {
+  const renderContent = (page: { content: any }) => {
+    const pageContent = page.content;
+    const displaySectionHeaders = {};
+
     return (
       <div className="w-2/3 p-8 bg-white">
         {/* About Me Section */}
-        {pageContent.some(section => section.type === 'aboutMe') && userData.aboutMe && (
+        {hasSectionType(page, "aboutMe") && userData.aboutMe && (
           <section className="mb-8">
-            <h2 
-              className="text-2xl font-bold mb-4 pb-2 border-b-2" 
+            <h2
+              className="text-2xl font-bold mb-4 pb-2 border-b-2"
               style={{ borderColor: primaryColor, color: primaryColor }}
             >
               About Me
@@ -651,131 +846,180 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
             <p className="text-gray-700">{userData.aboutMe}</p>
           </section>
         )}
-        
+
         {/* Experience Section */}
-        {pageContent.some(section => section.type === 'experience') && userData.experience && userData.experience.length > 0 && (
-          <section className="mb-8">
-            <h2 
-              className="text-2xl font-bold mb-4 pb-2 border-b-2" 
-              style={{ borderColor: primaryColor, color: primaryColor }}
-            >
-              Experience
-            </h2>
-            <div className="space-y-4">
-              {pageContent
-                .filter(section => section.type === 'experience')
-                .map(section => {
-                  const exp = userData.experience[section.index];
-                  return (
-                    <div key={section.index}>
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-bold">{exp.jobTitle}</h3>
-                        <span className="text-sm text-gray-500">
-                          {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
-                        </span>
+        {hasSectionType(page, "experience") &&
+          userData.experience &&
+          userData.experience.length > 0 && (
+            <section className="mb-8">
+              <h2
+                className="text-2xl font-bold mb-4 pb-2 border-b-2"
+                style={{ borderColor: primaryColor, color: primaryColor }}
+              >
+                Experience
+              </h2>
+              <div className="space-y-4">
+                {pageContent
+                  .filter(
+                    (section: { type: string }) => section.type === "experience"
+                  )
+                  .map((section: { index: React.Key | null | undefined }) => {
+                    const exp =
+                      typeof section.index === "number"
+                        ? userData.experience[section.index]
+                        : null;
+                    return (
+                      <div key={section.index} className="mb-4">
+                        <div className="flex justify-between items-center">
+                          {exp && <h3 className="font-bold">{exp.jobTitle}</h3>}
+                          {exp && (
+                            <span className="text-sm text-gray-500">
+                              {formatDate(exp.startDate)} -{" "}
+                              {formatDate(exp.endDate)}
+                            </span>
+                          )}
+                        </div>
+                        {exp && (
+                          <p className="text-gray-600 italic mb-2">
+                            {exp.company}
+                          </p>
+                        )}
+                        <ul className="list-disc ml-4 text-gray-700">
+                          {exp && <li>{exp.description}</li>}
+                        </ul>
                       </div>
-                      <p className="text-gray-600 italic mb-2">{exp.company}</p>
-                      <ul className="list-disc ml-4 text-gray-700">
-                        <li>{exp.description}</li>
-                      </ul>
-                    </div>
-                  );
-                })}
-            </div>
-          </section>
-        )}
-        
+                    );
+                  })}
+              </div>
+            </section>
+          )}
+
         {/* Education Section */}
-        {pageContent.some(section => section.type === 'education') && userData.education && userData.education.length > 0 && (
-          <section className="mb-8">
-            <h2 
-              className="text-2xl font-bold mb-4 pb-2 border-b-2" 
-              style={{ borderColor: primaryColor, color: primaryColor }}
-            >
-              Education
-            </h2>
-            {pageContent
-              .filter(section => section.type === 'education')
-              .map(section => {
-                const edu = userData.education[section.index];
-                return (
-                  <div key={section.index}>
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-bold">{edu.degree}</h3>
-                      <span className="text-sm text-gray-500">{edu.year_of_start} - {edu.year_of_completion}</span>
-                    </div>
-                    <p className="text-gray-600 italic">{edu.institution}</p>
-                  </div>
-                );
-              })}
-          </section>
-        )}
+        {hasSectionType(page, "education") &&
+          userData.education &&
+          userData.education.length > 0 && (
+            <section className="mb-8">
+              <h2
+                className="text-2xl font-bold mb-4 pb-2 border-b-2"
+                style={{ borderColor: primaryColor, color: primaryColor }}
+              >
+                Education
+              </h2>
+              <div className="space-y-4">
+                {pageContent
+                  .filter(
+                    (section: { type: string }) => section.type === "education"
+                  )
+                  .map((section: { index: React.Key | null | undefined }) => {
+                    const edu =
+                      typeof section.index === "number"
+                        ? userData.education[section.index]
+                        : null;
+                    return (
+                      <div key={section.index} className="mb-4">
+                        <div className="flex justify-between items-center">
+                          {edu && <h3 className="font-bold">{edu.degree}</h3>}
+                          {edu && (
+                            <span className="text-sm text-gray-500">
+                              {edu.year_of_start} - {edu.year_of_completion}
+                            </span>
+                          )}
+                        </div>
+                        {edu && (
+                          <p className="text-gray-600 italic">
+                            {edu.institution}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            </section>
+          )}
 
         {/* Projects Section */}
-        {pageContent.some(section => section.type === 'project') && userData.projects && userData.projects.length > 0 && (
-          <section className="mb-8">
-            <h2 
-              className="text-2xl font-bold mb-4 pb-2 border-b-2" 
-              style={{ borderColor: primaryColor, color: primaryColor }}
-            >
-              Projects
-            </h2>
-            <div className="space-y-4">
-              {pageContent
-                .filter(section => section.type === 'project')
-                .map(section => {
-                  const project = userData.projects[section.index];
-                  return (
-                    <div key={section.index}>
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-bold">{project.name}</h3>
-                        <span className="text-sm text-gray-500">
-                          {formatDate(project.startDate)} - {formatDate(project.endDate)}
-                        </span>
+        {hasSectionType(page, "project") &&
+          userData.projects &&
+          userData.projects.length > 0 && (
+            <section className="mb-8">
+              <h2
+                className="text-2xl font-bold mb-4 pb-2 border-b-2"
+                style={{ borderColor: primaryColor, color: primaryColor }}
+              >
+                Projects
+              </h2>
+              <div className="space-y-4">
+                {pageContent
+                  .filter(
+                    (section: { type: string }) => section.type === "project"
+                  )
+                  .map((section: { index: React.Key | null | undefined }) => {
+                    const project =
+                      typeof section.index === "number"
+                        ? userData.projects[section.index]
+                        : null;
+                    return (
+                      <div key={section.index} className="mb-4">
+                        <div className="flex justify-between items-center">
+                          {project && (
+                            <h3 className="font-bold">{project.name}</h3>
+                          )}
+                          {project && (
+                            <span className="text-sm text-gray-500">
+                              {formatDate(project.startDate)} -{" "}
+                              {formatDate(project.endDate)}
+                            </span>
+                          )}
+                        </div>
+                        {project && (
+                          <p className="text-gray-600 italic mb-2">
+                            {project.techStack}
+                          </p>
+                        )}
+                        {project && (
+                          <p className="text-gray-700">{project.description}</p>
+                        )}
+                        {project && project.link && (
+                          <p className="text-sm mt-1">
+                            <a
+                              href={project.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: primaryColor }}
+                            >
+                              View Project
+                            </a>
+                          </p>
+                        )}
                       </div>
-                      <p className="text-gray-600 italic mb-2">{project.techStack}</p>
-                      <p className="text-gray-700">{project.description}</p>
-                      {project.link && (
-                        <p className="text-sm mt-1">
-                          <a 
-                            href={project.link} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={{ color: primaryColor }}
-                          >
-                            View Project
-                          </a>
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          </section>
-        )}
+                    );
+                  })}
+              </div>
+            </section>
+          )}
       </div>
     );
   };
-  
+
   return (
     <div className={containerClass}>
       {pages.map((page, pageIndex) => (
-        <div 
+        <div
           key={pageIndex}
           className="relative mx-auto bg-white shadow-lg mb-8"
-          style={{ 
-            width: `${A4_WIDTH}px`, 
+          style={{
+            width: `${A4_WIDTH}px`,
             height: `${A4_HEIGHT}px`,
-            breakAfter: 'page',
-            breakInside: 'avoid',
-            overflow: 'hidden'
+            breakAfter: "page",
+            breakInside: "avoid",
+            overflow: "hidden",
           }}
         >
           <div className="flex h-full">
             {renderSidebar(pageIndex)}
-            {renderContent(page.content)}
+            {renderContent(page)}
           </div>
-          
+
           {/* Page number */}
           {pages.length > 1 && (
             <div className="absolute bottom-4 right-4 text-sm text-gray-500">
@@ -793,12 +1037,16 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
-  userData
+  userData,
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
-  
+
   if (!userData) {
-    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+    return (
+      <div className={containerClass}>
+        <div className="p-8">Loading...</div>
+      </div>
+    );
   }
 
   // Group skills by type
@@ -811,24 +1059,32 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
     Languages: [],
     Frameworks: [],
     Tools: [],
-    Databases: []
+    Databases: [],
   };
 
   if (userData.skills && userData.skills.length > 0) {
-    userData.skills.forEach(skill => {
-      if (skill.name.toLowerCase().includes('python') || 
-          skill.name.toLowerCase().includes('java') || 
-          skill.name.toLowerCase().includes('script')) {
+    userData.skills.forEach((skill) => {
+      if (
+        skill.name.toLowerCase().includes("python") ||
+        skill.name.toLowerCase().includes("java") ||
+        skill.name.toLowerCase().includes("script")
+      ) {
         groupedSkills.Languages.push(skill.name);
-      } else if (skill.name.toLowerCase().includes('react') || 
-                skill.name.toLowerCase().includes('node') || 
-                skill.name.toLowerCase().includes('framework')) {
+      } else if (
+        skill.name.toLowerCase().includes("react") ||
+        skill.name.toLowerCase().includes("node") ||
+        skill.name.toLowerCase().includes("framework")
+      ) {
         groupedSkills.Frameworks.push(skill.name);
-      } else if (skill.name.toLowerCase().includes('git') || 
-                skill.name.toLowerCase().includes('docker')) {
+      } else if (
+        skill.name.toLowerCase().includes("git") ||
+        skill.name.toLowerCase().includes("docker")
+      ) {
         groupedSkills.Tools.push(skill.name);
-      } else if (skill.name.toLowerCase().includes('sql') || 
-                skill.name.toLowerCase().includes('mongo')) {
+      } else if (
+        skill.name.toLowerCase().includes("sql") ||
+        skill.name.toLowerCase().includes("mongo")
+      ) {
         groupedSkills.Databases.push(skill.name);
       } else {
         // Default to Tools category
@@ -836,20 +1092,22 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
       }
     });
   }
-  
+
   return (
     <div className={containerClass}>
       <div className="p-8">
         {/* Header */}
         <header className="mb-8 text-center">
-          <h1 
-            className="text-4xl font-bold mb-2" 
+          <h1
+            className="text-4xl font-bold mb-2"
             style={{ color: primaryColor }}
           >
             {userData.name.toUpperCase()}
           </h1>
           <p className="text-xl mb-4">
-            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Software Engineer"}
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0
+              ? userData.aspiringRoles[0]
+              : "Software Engineer"}
           </p>
           <div className="flex justify-center space-x-4 text-sm text-gray-600">
             <span>{userData.email}</span>
@@ -863,31 +1121,32 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
             {userData.github && <span>{userData.github}</span>}
           </div>
         </header>
-        
+
         {/* Technical Skills */}
         <section className="mb-8">
-          <h2 
+          <h2
             className="text-lg font-bold mb-4 uppercase tracking-wider"
             style={{ color: primaryColor }}
           >
             Technical Skills
           </h2>
           <div className="grid grid-cols-2 gap-4">
-            {Object.entries(groupedSkills).map(([category, skills]) => (
-              skills.length > 0 && (
-                <div key={category}>
-                  <h3 className="font-semibold mb-2">{category}</h3>
-                  <p className="text-gray-700">{skills.join(', ')}</p>
-                </div>
-              )
-            ))}
+            {Object.entries(groupedSkills).map(
+              ([category, skills]) =>
+                skills.length > 0 && (
+                  <div key={category}>
+                    <h3 className="font-semibold mb-2">{category}</h3>
+                    <p className="text-gray-700">{skills.join(", ")}</p>
+                  </div>
+                )
+            )}
           </div>
         </section>
-        
+
         {/* Experience */}
         {userData.experience && userData.experience.length > 0 && (
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-lg font-bold mb-4 uppercase tracking-wider"
               style={{ color: primaryColor }}
             >
@@ -898,7 +1157,9 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
                 <div key={index}>
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold">{exp.jobTitle}</h3>
-                    <span>{formatDate(exp.startDate)} - {formatDate(exp.endDate)}</span>
+                    <span>
+                      {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+                    </span>
                   </div>
                   <p className="text-gray-600 mb-2">{exp.company}</p>
                   <ul className="list-disc ml-4 text-gray-700">
@@ -909,11 +1170,11 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
             </div>
           </section>
         )}
-        
+
         {/* Projects */}
         {userData.projects && userData.projects.length > 0 && (
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-lg font-bold mb-4 uppercase tracking-wider"
               style={{ color: primaryColor }}
             >
@@ -923,22 +1184,18 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
               {userData.projects.map((project, index) => (
                 <div key={index}>
                   <h3 className="font-semibold">{project.name}</h3>
-                  <p className="text-gray-700 mb-2">
-                    {project.techStack}
-                  </p>
-                  <p className="text-gray-700">
-                    {project.description}
-                  </p>
+                  <p className="text-gray-700 mb-2">{project.techStack}</p>
+                  <p className="text-gray-700">{project.description}</p>
                 </div>
               ))}
             </div>
           </section>
         )}
-        
+
         {/* Education */}
         {userData.education && userData.education.length > 0 && (
           <section>
-            <h2 
+            <h2
               className="text-lg font-bold mb-4 uppercase tracking-wider"
               style={{ color: primaryColor }}
             >
@@ -948,7 +1205,9 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
               <div key={index}>
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold">{edu.degree}</h3>
-                  <span>{edu.year_of_start} - {edu.year_of_completion}</span>
+                  <span>
+                    {edu.year_of_start} - {edu.year_of_completion}
+                  </span>
                 </div>
                 <p className="text-gray-600">{edu.institution}</p>
               </div>
@@ -959,7 +1218,7 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
         {/* Certifications */}
         {userData.certifications && userData.certifications.length > 0 && (
           <section className="mt-8">
-            <h2 
+            <h2
               className="text-lg font-bold mb-4 uppercase tracking-wider"
               style={{ color: primaryColor }}
             >
@@ -986,22 +1245,31 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
   preview = false,
-  userData
+  userData,
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
-  
+
   if (!userData) {
-    return <div className={containerClass}><div className="p-8">Loading...</div></div>;
+    return (
+      <div className={containerClass}>
+        <div className="p-8">Loading...</div>
+      </div>
+    );
   }
-  
+
   return (
     <div className={containerClass}>
       <div className="p-8">
         {/* Header */}
-        <header className="mb-8 pb-4 border-b-2" style={{ borderColor: primaryColor }}>
+        <header
+          className="mb-8 pb-4 border-b-2"
+          style={{ borderColor: primaryColor }}
+        >
           <h1 className="text-3xl font-bold mb-2">{userData.name}</h1>
           <p className="text-gray-700 mb-4">
-            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Academic Professional"}
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0
+              ? userData.aspiringRoles[0]
+              : "Academic Professional"}
           </p>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
@@ -1016,11 +1284,11 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
             </div>
           </div>
         </header>
-        
+
         {/* Education */}
         {userData.education && userData.education.length > 0 && (
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-2xl font-semibold mb-4"
               style={{ color: primaryColor }}
             >
@@ -1030,17 +1298,20 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
               {userData.education.map((edu, index) => (
                 <div key={index}>
                   <h3 className="font-semibold">{edu.degree}</h3>
-                  <p className="italic">{edu.institution}, {edu.year_of_start} - {edu.year_of_completion}</p>
+                  <p className="italic">
+                    {edu.institution}, {edu.year_of_start} -{" "}
+                    {edu.year_of_completion}
+                  </p>
                 </div>
               ))}
             </div>
           </section>
         )}
-        
+
         {/* Research Experience */}
         {userData.experience && userData.experience.length > 0 && (
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-2xl font-semibold mb-4"
               style={{ color: primaryColor }}
             >
@@ -1050,7 +1321,10 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
               {userData.experience.map((exp, index) => (
                 <div key={index}>
                   <h3 className="font-semibold">{exp.jobTitle}</h3>
-                  <p className="italic">{exp.company}, {formatDate(exp.startDate)} - {formatDate(exp.endDate)}</p>
+                  <p className="italic">
+                    {exp.company}, {formatDate(exp.startDate)} -{" "}
+                    {formatDate(exp.endDate)}
+                  </p>
                   <ul className="list-disc ml-4 mt-2 text-gray-700">
                     <li>{exp.description}</li>
                   </ul>
@@ -1059,11 +1333,11 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
             </div>
           </section>
         )}
-        
+
         {/* Publications/Projects */}
         {userData.projects && userData.projects.length > 0 && (
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-2xl font-semibold mb-4"
               style={{ color: primaryColor }}
             >
@@ -1073,7 +1347,10 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
               {userData.projects.map((project, index) => (
                 <div key={index}>
                   <h3 className="font-semibold">{project.name}</h3>
-                  <p className="italic">{formatDate(project.startDate)} - {formatDate(project.endDate)}</p>
+                  <p className="italic">
+                    {formatDate(project.startDate)} -{" "}
+                    {formatDate(project.endDate)}
+                  </p>
                   <p className="mt-1 text-gray-700">{project.description}</p>
                   {project.link && (
                     <p>
@@ -1092,11 +1369,11 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
             </div>
           </section>
         )}
-        
+
         {/* Skills and Methods */}
         {userData.skills && userData.skills.length > 0 && (
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-2xl font-semibold mb-4"
               style={{ color: primaryColor }}
             >
@@ -1104,16 +1381,18 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
             </h2>
             <div className="grid grid-cols-2 gap-2">
               {userData.skills.map((skill, index) => (
-                <p key={index} className="text-gray-700">• {skill.name}</p>
+                <p key={index} className="text-gray-700">
+                  • {skill.name}
+                </p>
               ))}
             </div>
           </section>
         )}
-        
+
         {/* Languages */}
         {userData.languages && userData.languages.length > 0 && (
           <section className="mb-8">
-            <h2 
+            <h2
               className="text-2xl font-semibold mb-4"
               style={{ color: primaryColor }}
             >
@@ -1121,16 +1400,18 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
             </h2>
             <div className="grid grid-cols-2 gap-2">
               {userData.languages.map((lang, index) => (
-                <p key={index} className="text-gray-700">• {lang.language}: {lang.proficiency}</p>
+                <p key={index} className="text-gray-700">
+                  • {lang.language}: {lang.proficiency}
+                </p>
               ))}
             </div>
           </section>
         )}
-        
+
         {/* Certifications */}
         {userData.certifications && userData.certifications.length > 0 && (
           <section>
-            <h2 
+            <h2
               className="text-2xl font-semibold mb-4"
               style={{ color: primaryColor }}
             >
@@ -1140,7 +1421,9 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
               {userData.certifications.map((cert, index) => (
                 <div key={index}>
                   <p className="font-semibold">{cert.name}</p>
-                  <p className="italic">{cert.organization}, {cert.year}</p>
+                  <p className="italic">
+                    {cert.organization}, {cert.year}
+                  </p>
                 </div>
               ))}
             </div>
@@ -1159,22 +1442,58 @@ export default function ResumeBuilder() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { userId } = useAuth();
-  
+
   // Get template component based on selection
   const getTemplateComponent = () => {
     switch (selectedTemplate) {
       case "minimal":
-        return <MinimalClassic font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+        return (
+          <MinimalClassic
+            font={selectedFont}
+            primaryColor={primaryColor}
+            userData={userData}
+          />
+        );
       case "modern":
-        return <ModernProfessional font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+        return (
+          <ModernProfessional
+            font={selectedFont}
+            primaryColor={primaryColor}
+            userData={userData}
+          />
+        );
       case "bold":
-        return <BoldCreative font={selectedFont} primaryColor={primaryColor} userData={userData} />;
-      case "academic": 
-        return <AcademicCV font={selectedFont} primaryColor={primaryColor} userData={userData} />;
-      case "technical": 
-        return <MinimalistTechnical font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+        return (
+          <BoldCreative
+            font={selectedFont}
+            primaryColor={primaryColor}
+            userData={userData}
+          />
+        );
+      case "academic":
+        return (
+          <AcademicCV
+            font={selectedFont}
+            primaryColor={primaryColor}
+            userData={userData}
+          />
+        );
+      case "technical":
+        return (
+          <MinimalistTechnical
+            font={selectedFont}
+            primaryColor={primaryColor}
+            userData={userData}
+          />
+        );
       default:
-        return <BoldCreative font={selectedFont} primaryColor={primaryColor} userData={userData} />;
+        return (
+          <BoldCreative
+            font={selectedFont}
+            primaryColor={primaryColor}
+            userData={userData}
+          />
+        );
     }
   };
 
@@ -1188,25 +1507,28 @@ export default function ResumeBuilder() {
           console.log("No user ID available yet");
           return;
         }
-        
+
         // Fetch data from the specified API endpoint
-        const response = await fetch(`http://localhost:8000/api/resume?user_id=${userId }`);
-        
+        const response = await fetch(
+          `http://localhost:8000/api/resume?user_id=${userId}`
+        );
+
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`);
         }
-        
+
         const data = await response.json();
         setUserData(data);
       } catch (error) {
         console.error("Error fetching user data:", error);
-        
+
         // Fallback to mock data if API request fails
         const mockData: UserData = {
           name: "Jane Doe",
           email: "jane.doe@example.com",
           profilePicture: "",
-          aboutMe: "Driven software engineer with 5+ years of experience in web development. Passionate about creating clean, efficient code and solving complex problems.",
+          aboutMe:
+            "Driven software engineer with 5+ years of experience in web development. Passionate about creating clean, efficient code and solving complex problems.",
           linkedIn: "linkedin.com/in/janedoe",
           github: "github.com/janedoe",
           education: [
@@ -1214,8 +1536,8 @@ export default function ResumeBuilder() {
               degree: "BSc in Computer Science",
               institution: "University of Technology",
               year_of_start: "2015",
-              year_of_completion: "2019"
-            }
+              year_of_completion: "2019",
+            },
           ],
           experience: [
             {
@@ -1223,25 +1545,28 @@ export default function ResumeBuilder() {
               company: "Tech Solutions Inc.",
               startDate: "01-06-2021",
               endDate: "Present",
-              description: "Led a team of 5 developers in building a SaaS platform that increased client retention by 25%."
+              description:
+                "Led a team of 5 developers in building a SaaS platform that increased client retention by 25%.",
             },
             {
               jobTitle: "Frontend Developer",
               company: "Digital Innovations",
               startDate: "01-04-2019",
               endDate: "31-05-2021",
-              description: "Developed responsive web applications using React and Next.js."
-            }
+              description:
+                "Developed responsive web applications using React and Next.js.",
+            },
           ],
           projects: [
             {
               name: "E-commerce Platform",
-              description: "Built a scalable e-commerce platform with React, Node.js, and MongoDB.",
+              description:
+                "Built a scalable e-commerce platform with React, Node.js, and MongoDB.",
               startDate: "01-01-2020",
               endDate: "01-06-2020",
               techStack: "React, Node.js, MongoDB",
-              link: "github.com/janedoe/ecommerce"
-            }
+              link: "github.com/janedoe/ecommerce",
+            },
           ],
           certifications: [
             {
@@ -1249,54 +1574,54 @@ export default function ResumeBuilder() {
               organization: "Amazon Web Services",
               year: "2021",
               credentialId: "AWS-DEV-12345",
-              credentialUrl: "aws.amazon.com/certification"
-            }
+              credentialUrl: "aws.amazon.com/certification",
+            },
           ],
           skills: [
             {
               skill: "frontend",
               name: "React",
-              level: "Expert"
+              level: "Expert",
             },
             {
               skill: "frontend",
               name: "JavaScript",
-              level: "Expert"
+              level: "Expert",
             },
             {
               skill: "backend",
               name: "Node.js",
-              level: "Intermediate"
-            }
+              level: "Intermediate",
+            },
           ],
           languages: [
             {
               language: "English",
-              proficiency: "Native"
+              proficiency: "Native",
             },
             {
               language: "Spanish",
-              proficiency: "Intermediate"
-            }
+              proficiency: "Intermediate",
+            },
           ],
           hobbies: ["Hiking", "Photography", "Coding"],
           aspiringRoles: ["Senior Frontend Developer", "Tech Lead"],
-          aspiringCompanies: ["Google", "Microsoft", "Airbnb"]
+          aspiringCompanies: ["Google", "Microsoft", "Airbnb"],
         };
-        
+
         setUserData(mockData);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     fetchUserData();
   }, [userId]);
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
       <h1 className="text-3xl font-bold mb-6"></h1>
-      
+
       {/* Side-by-side layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left column - Styling options */}
@@ -1322,23 +1647,27 @@ export default function ResumeBuilder() {
                     </SelectTrigger>
                     <SelectContent position="popper">
                       <SelectItem value="minimal">Minimal Classic</SelectItem>
-                      <SelectItem value="modern">Modern Professional</SelectItem>
+                      <SelectItem value="modern">
+                        Modern Professional
+                      </SelectItem>
                       <SelectItem value="bold">Bold Creative</SelectItem>
                       <SelectItem value="academic">Academic CV</SelectItem>
-                      <SelectItem value="technical">Minimalist Technical</SelectItem>
+                      <SelectItem value="technical">
+                        Minimalist Technical
+                      </SelectItem>
                       {/* You can add the other templates here */}
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 {/* Font Selection */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Font
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Font</label>
                   <Select
                     value={selectedFont}
-                    onValueChange={(value) => setSelectedFont(value as FontType)}
+                    onValueChange={(value) =>
+                      setSelectedFont(value as FontType)
+                    }
                     defaultOpen={false}
                   >
                     <SelectTrigger className="w-full">
@@ -1352,7 +1681,7 @@ export default function ResumeBuilder() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 {/* Color Selection */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -1373,7 +1702,7 @@ export default function ResumeBuilder() {
                     />
                   </div>
                 </div>
-                
+
                 {/* Export Button */}
                 <Button className="w-full mt-8">
                   <Eye className="w-4 h-4 mr-2" />
@@ -1383,7 +1712,7 @@ export default function ResumeBuilder() {
             </CardContent>
           </Card>
         </div>
-        
+
         {/* Right column - Preview */}
         <div className="md:col-span-2">
           <Card className="h-full">
