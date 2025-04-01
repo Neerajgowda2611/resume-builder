@@ -423,235 +423,6 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
   );
 };
 
-// // 3. Bold Creative Template
-// const BoldCreative: React.FC<BaseTemplateProps> = ({
-//   font,
-//   primaryColor,
-//   preview = false,
-//   userData
-// }) => {
-//   const containerClass = getA4ContainerClass(font, preview);
-
-//   if (!userData) {
-//     return <div className={containerClass}><div className="p-8">Loading...</div></div>;
-//   }
-  
-//   // Get user initials for avatar
-//   const getInitials = (name: string) => {
-//     if (!name) return "N/A";
-//     return name.split(' ').map(n => n[0]).join('').toUpperCase();
-//   };
-  
-//   return (
-//     <div className={containerClass}>
-//       <div className="flex h-full">
-//         {/* Sidebar */}
-//         <div 
-//           className="w-1/3 p-8 text-white" 
-//           style={{ backgroundColor: primaryColor }}
-//         >
-//           <div className="mb-12">
-//             <div className="w-32 h-32 rounded-full bg-white mb-4 mx-auto overflow-hidden">
-//               {/* Profile Image or Placeholder */}
-//               <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-//                 {userData.profilePicture ? (
-//                   <img src={userData.profilePicture} alt={userData.name} className="w-full h-full object-cover" />
-//                 ) : (
-//                   <span className="text-gray-600 text-2xl">{getInitials(userData.name)}</span>
-//                 )}
-//               </div>
-//             </div>
-//             <h1 className="text-2xl font-bold text-center mb-1">{userData.name}</h1>
-//             <p className="text-center opacity-90">
-//               {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
-//             </p>
-//           </div>
-          
-//           <div className="space-y-8">
-//             <section>
-//               <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-//                 Contact
-//               </h2>
-//               <div className="space-y-2">
-//                 <p>{userData.email}</p>
-//                 {userData.linkedIn && <p>{userData.linkedIn}</p>}
-//                 {userData.github && <p>{userData.github}</p>}
-//               </div>
-//             </section>
-            
-//             {userData.skills && userData.skills.length > 0 && (
-//               <section>
-//                 <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-//                   Skills
-//                 </h2>
-//                 <div className="space-y-1">
-//                   {userData.skills.map((skill, index) => (
-//                     <div key={index} className="flex items-center">
-//                       <div className="w-24">{skill.name}</div>
-//                       <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-//                         <div 
-//                           className="bg-white h-2 rounded-full" 
-//                           style={{ 
-//                             width: skill.level === "Beginner" ? "33%" : 
-//                                    skill.level === "Intermediate" ? "66%" : "90%" 
-//                           }}
-//                         ></div>
-//                       </div>
-//                     </div>
-//                   ))}
-//                 </div>
-//               </section>
-//             )}
-            
-//             {userData.hobbies && userData.hobbies.length > 0 && (
-//               <section>
-//                 <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-//                   Hobbies
-//                 </h2>
-//                 <div className="flex flex-wrap gap-2">
-//                   {userData.hobbies.map((hobby, index) => (
-//                     <span 
-//                       key={index}
-//                       className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm"
-//                     >
-//                       {hobby}
-//                     </span>
-//                   ))}
-//                 </div>
-//               </section>
-//             )}
-
-//             {userData.languages && userData.languages.length > 0 && (
-//               <section>
-//                 <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-//                   Languages
-//                 </h2>
-//                 <div className="space-y-1">
-//                   {userData.languages.map((lang, index) => (
-//                     <div key={index} className="flex items-center">
-//                       <div className="w-24">{lang.language}</div>
-//                       <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-//                         <div 
-//                           className="bg-white h-2 rounded-full" 
-//                           style={{ 
-//                             width: lang.proficiency === "Beginner" ? "33%" : 
-//                                    lang.proficiency === "Intermediate" ? "66%" : "90%" 
-//                           }}
-//                         ></div>
-//                       </div>
-//                     </div>
-//                   ))}
-//                 </div>
-//               </section>
-//             )}
-//           </div>
-//         </div>
-        
-//         {/* Main Content */}
-//         <div className="w-2/3 p-8 bg-white">
-//           {userData.aboutMe && (
-//             <section className="mb-8">
-//               <h2 
-//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
-//                 style={{ borderColor: primaryColor, color: primaryColor }}
-//               >
-//                 About Me
-//               </h2>
-//               <p className="text-gray-700">{userData.aboutMe}</p>
-//             </section>
-//           )}
-          
-//           {userData.experience && userData.experience.length > 0 && (
-//             <section className="mb-8">
-//               <h2 
-//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
-//                 style={{ borderColor: primaryColor, color: primaryColor }}
-//               >
-//                 Experience
-//               </h2>
-//               <div className="space-y-4">
-//                 {userData.experience.map((exp, index) => (
-//                   <div key={index}>
-//                     <div className="flex justify-between items-center">
-//                       <h3 className="font-bold">{exp.jobTitle}</h3>
-//                       <span className="text-sm text-gray-500">
-//                         {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
-//                       </span>
-//                     </div>
-//                     <p className="text-gray-600 italic mb-2">{exp.company}</p>
-//                     <ul className="list-disc ml-4 text-gray-700">
-//                       <li>{exp.description}</li>
-//                     </ul>
-//                   </div>
-//                 ))}
-//               </div>
-//             </section>
-//           )}
-          
-//           {userData.education && userData.education.length > 0 && (
-//             <section>
-//               <h2 
-//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
-//                 style={{ borderColor: primaryColor, color: primaryColor }}
-//               >
-//                 Education
-//               </h2>
-//               {userData.education.map((edu, index) => (
-//                 <div key={index}>
-//                   <div className="flex justify-between items-center">
-//                     <h3 className="font-bold">{edu.degree}</h3>
-//                     <span className="text-sm text-gray-500">{edu.year_of_start} - {edu.year_of_completion}</span>
-//                   </div>
-//                   <p className="text-gray-600 italic">{edu.institution}</p>
-//                 </div>
-//               ))}
-//             </section>
-//           )}
-
-//           {userData.projects && userData.projects.length > 0 && (
-//             <section className="mt-8">
-//               <h2 
-//                 className="text-2xl font-bold mb-4 pb-2 border-b-2" 
-//                 style={{ borderColor: primaryColor, color: primaryColor }}
-//               >
-//                 Projects
-//               </h2>
-//               <div className="space-y-4">
-//                 {userData.projects.map((project, index) => (
-//                   <div key={index}>
-//                     <div className="flex justify-between items-center">
-//                       <h3 className="font-bold">{project.name}</h3>
-//                       <span className="text-sm text-gray-500">
-//                         {formatDate(project.startDate)} - {formatDate(project.endDate)}
-//                       </span>
-//                     </div>
-//                     <p className="text-gray-600 italic mb-2">{project.techStack}</p>
-//                     <p className="text-gray-700">{project.description}</p>
-//                     {project.link && (
-//                       <p className="text-sm mt-1">
-//                         <a 
-//                           href={project.link} 
-//                           target="_blank" 
-//                           rel="noopener noreferrer"
-//                           style={{ color: primaryColor }}
-//                         >
-//                           View Project
-//                         </a>
-//                       </p>
-//                     )}
-//                   </div>
-//                 ))}
-//               </div>
-//             </section>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-
-// 3. Bold Creative Template
 const BoldCreative: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
@@ -741,109 +512,128 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
   
-  // Render sidebar content
-  const renderSidebar = () => (
-    <div 
-      className="w-1/3 p-8 text-white" 
-      style={{ backgroundColor: primaryColor }}
-    >
-      <div className="mb-12">
-        <div className="w-32 h-32 rounded-full bg-white mb-4 mx-auto overflow-hidden">
-          {/* Profile Image or Placeholder */}
-          <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-            {userData.profilePicture ? (
-              <img src={userData.profilePicture} alt={userData.name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-gray-600 text-2xl">{getInitials(userData.name)}</span>
-            )}
+  // Format date function
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Present";
+    return dateString;
+  };
+  
+  // Render sidebar content - only for the first page
+  const renderSidebar = (pageIndex: number) => {
+    // For pages after the first one, render an empty sidebar with the same background color
+    if (pageIndex > 0) {
+      return (
+        <div 
+          className="w-1/3" 
+          style={{ backgroundColor: primaryColor }}
+        ></div>
+      );
+    }
+    
+    // For the first page, render the full sidebar
+    return (
+      <div 
+        className="w-1/3 p-8 text-white" 
+        style={{ backgroundColor: primaryColor }}
+      >
+        <div className="mb-12">
+          <div className="w-32 h-32 rounded-full bg-white mb-4 mx-auto overflow-hidden">
+            {/* Profile Image or Placeholder */}
+            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+              {userData.profilePicture ? (
+                <img src={userData.profilePicture} alt={userData.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-gray-600 text-2xl">{getInitials(userData.name)}</span>
+              )}
+            </div>
           </div>
+          <h1 className="text-2xl font-bold text-center mb-1">{userData.name}</h1>
+          <p className="text-center opacity-90">
+            {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
+          </p>
         </div>
-        <h1 className="text-2xl font-bold text-center mb-1">{userData.name}</h1>
-        <p className="text-center opacity-90">
-          {userData.aspiringRoles && userData.aspiringRoles.length > 0 ? userData.aspiringRoles[0] : "Professional"}
-        </p>
-      </div>
-      
-      <div className="space-y-8">
-        <section>
-          <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-            Contact
-          </h2>
-          <div className="space-y-2">
-            <p>{userData.email}</p>
-            {userData.linkedIn && <p>{userData.linkedIn}</p>}
-            {userData.github && <p>{userData.github}</p>}
-          </div>
-        </section>
         
-        {userData.skills && userData.skills.length > 0 && (
+        <div className="space-y-8">
           <section>
             <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-              Skills
+              Contact
             </h2>
-            <div className="space-y-1">
-              {userData.skills.map((skill, index) => (
-                <div key={index} className="flex items-center">
-                  <div className="w-24">{skill.name}</div>
-                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                    <div 
-                      className="bg-white h-2 rounded-full" 
-                      style={{ 
-                        width: skill.level === "Beginner" ? "33%" : 
-                               skill.level === "Intermediate" ? "66%" : "90%" 
-                      }}
-                    ></div>
+            <div className="space-y-2">
+              <p>{userData.email}</p>
+              {userData.linkedIn && <p>{userData.linkedIn}</p>}
+              {userData.github && <p>{userData.github}</p>}
+            </div>
+          </section>
+          
+          {userData.skills && userData.skills.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+                Skills
+              </h2>
+              <div className="space-y-1">
+                {userData.skills.map((skill, index) => (
+                  <div key={index} className="flex items-center">
+                    <div className="w-24">{skill.name}</div>
+                    <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
+                      <div 
+                        className="bg-white h-2 rounded-full" 
+                        style={{ 
+                          width: skill.level === "Beginner" ? "33%" : 
+                                skill.level === "Intermediate" ? "66%" : "90%" 
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-        
-        {userData.hobbies && userData.hobbies.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-              Hobbies
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {userData.hobbies.map((hobby, index) => (
-                <span 
-                  key={index}
-                  className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm"
-                >
-                  {hobby}
-                </span>
-              ))}
-            </div>
-          </section>
-        )}
+                ))}
+              </div>
+            </section>
+          )}
+          
+          {userData.hobbies && userData.hobbies.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+                Hobbies
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {userData.hobbies.map((hobby, index) => (
+                  <span 
+                    key={index}
+                    className="px-2 py-1 bg-white bg-opacity-20 rounded text-sm"
+                  >
+                    {hobby}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
 
-        {userData.languages && userData.languages.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
-              Languages
-            </h2>
-            <div className="space-y-1">
-              {userData.languages.map((lang, index) => (
-                <div key={index} className="flex items-center">
-                  <div className="w-24">{lang.language}</div>
-                  <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
-                    <div 
-                      className="bg-white h-2 rounded-full" 
-                      style={{ 
-                        width: lang.proficiency === "Beginner" ? "33%" : 
-                               lang.proficiency === "Intermediate" ? "66%" : "90%" 
-                      }}
-                    ></div>
+          {userData.languages && userData.languages.length > 0 && (
+            <section>
+              <h2 className="text-lg font-bold mb-3 border-b border-white pb-1">
+                Languages
+              </h2>
+              <div className="space-y-1">
+                {userData.languages.map((lang, index) => (
+                  <div key={index} className="flex items-center">
+                    <div className="w-24">{lang.language}</div>
+                    <div className="flex-1 bg-white bg-opacity-20 h-2 rounded-full">
+                      <div 
+                        className="bg-white h-2 rounded-full" 
+                        style={{ 
+                          width: lang.proficiency === "Beginner" ? "33%" : 
+                                lang.proficiency === "Intermediate" ? "66%" : "90%" 
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
   
   // Render main content
   const renderContent = (pageContent: any[]) => {
@@ -982,7 +772,7 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
           }}
         >
           <div className="flex h-full">
-            {renderSidebar()}
+            {renderSidebar(pageIndex)}
             {renderContent(page.content)}
           </div>
           
@@ -997,7 +787,6 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
     </div>
   );
 };
-
 
 // 4. Minimalist Technical Template
 const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
