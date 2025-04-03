@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -139,9 +139,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
         id: "summary",
         title: "Professional Summary",
         condition: !!userData.aboutMe,
-        content: () => (
-          <p className="text-gray-700">{userData.aboutMe}</p>
-        )
+        content: () => <p className="text-gray-700">{userData.aboutMe}</p>,
       },
       {
         id: "experience",
@@ -150,7 +148,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
         content: () => (
           <div className="space-y-4">
             {userData.experience.map((exp, index) => (
-              <div key={index}>
+              <React.Fragment key={index}>
                 <h3 className="font-semibold">
                   {exp.jobTitle} - {exp.company}
                 </h3>
@@ -161,10 +159,10 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
                     : formatDate(exp.endDate)}
                 </p>
                 <p className="mt-2 text-gray-700">{exp.description}</p>
-              </div>
+              </React.Fragment>
             ))}
           </div>
-        )
+        ),
       },
       {
         id: "education",
@@ -182,7 +180,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               </div>
             ))}
           </div>
-        )
+        ),
       },
       {
         id: "projects",
@@ -202,12 +200,17 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
                 <p className="mt-1 text-gray-700">{project.description}</p>
                 {project.techStack && (
                   <p className="mt-1">
-                    <span className="font-medium">Tech Stack:</span> {project.techStack}
+                    <span className="font-medium">Tech Stack:</span>{" "}
+                    {project.techStack}
                   </p>
                 )}
                 {project.link && (
                   <p className="mt-1 text-blue-600">
-                    <a href={project.link} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={project.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Project Link
                     </a>
                   </p>
@@ -215,12 +218,13 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               </div>
             ))}
           </div>
-        )
+        ),
       },
       {
         id: "certifications",
         title: "Certifications",
-        condition: userData.certifications && userData.certifications.length > 0,
+        condition:
+          userData.certifications && userData.certifications.length > 0,
         content: () => (
           <div className="space-y-3">
             {userData.certifications.map((cert, index) => (
@@ -231,7 +235,11 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
                 </p>
                 {cert.credentialUrl && (
                   <p className="text-blue-600 text-sm">
-                    <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={cert.credentialUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Credential ID: {cert.credentialId}
                     </a>
                   </p>
@@ -239,7 +247,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               </div>
             ))}
           </div>
-        )
+        ),
       },
       {
         id: "skills",
@@ -260,7 +268,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               </span>
             ))}
           </div>
-        )
+        ),
       },
       {
         id: "languages",
@@ -275,7 +283,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               </div>
             ))}
           </div>
-        )
+        ),
       },
       {
         id: "hobbies",
@@ -296,9 +304,9 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               </span>
             ))}
           </div>
-        )
-      }
-    ].filter(section => section.condition);
+        ),
+      },
+    ].filter((section) => section.condition);
   }, [userData, primaryColor]);
 
   // Maximum content height per page (in px)
@@ -306,19 +314,20 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
   const HEADER_HEIGHT = 120; // Approximate header height
   const FOOTER_HEIGHT = 30; // Approximate footer height
   const PAGE_PADDING = 64; // 32px top + 32px bottom
-  const MAX_CONTENT_HEIGHT = A4_PAGE_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT - PAGE_PADDING;
+  const MAX_CONTENT_HEIGHT =
+    A4_PAGE_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT - PAGE_PADDING;
 
   // State to track pages and their content
   const [pageContents, setPageContents] = React.useState<any[]>([]);
-  
+
   // Function to distribute sections across pages
   React.useEffect(() => {
     // Function to measure rendered element height
     const measureElementHeight = (element: HTMLElement) => {
       const clone = element.cloneNode(true) as HTMLElement;
-      clone.style.position = 'absolute';
-      clone.style.visibility = 'hidden';
-      clone.style.height = 'auto';
+      clone.style.position = "absolute";
+      clone.style.visibility = "hidden";
+      clone.style.height = "auto";
       document.body.appendChild(clone);
       const height = clone.offsetHeight;
       document.body.removeChild(clone);
@@ -330,7 +339,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
       const pages: any[] = [[]];
       let currentPage = 0;
       let currentPageHeight = 0;
-      
+
       // Header is only on the first page, so start with its height
       if (currentPage === 0) {
         currentPageHeight += HEADER_HEIGHT;
@@ -338,39 +347,39 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
 
       sections.forEach((section, index) => {
         // Create a temporary element to measure section height
-        const tempElement = document.createElement('div');
+        const tempElement = document.createElement("div");
         tempElement.innerHTML = `<h2 class="text-xl font-semibold mb-4">${section.title}</h2>`;
-        const contentContainer = document.createElement('div');
+        const contentContainer = document.createElement("div");
         tempElement.appendChild(contentContainer);
-        
+
         // Estimate section height (in a real app, we would render and measure)
         // This is a simplified approach - in production, you'd want to use a ref or portals
         let sectionHeight = 60; // Base height for title + margins
-        
+
         // Estimate content height based on section type
         switch (section.id) {
-          case 'summary':
+          case "summary":
             sectionHeight += userData.aboutMe.length / 5; // Rough estimate
             break;
-          case 'experience':
+          case "experience":
             sectionHeight += userData.experience.length * 120; // Rough estimate per item
             break;
-          case 'education':
+          case "education":
             sectionHeight += userData.education.length * 100; // Rough estimate per item
             break;
-          case 'projects':
+          case "projects":
             sectionHeight += userData.projects.length * 140; // Rough estimate per item
             break;
-          case 'certifications':
+          case "certifications":
             sectionHeight += userData.certifications.length * 100; // Rough estimate per item
             break;
-          case 'skills':
+          case "skills":
             sectionHeight += 50; // Fixed height
             break;
-          case 'languages':
+          case "languages":
             sectionHeight += 40; // Fixed height
             break;
-          case 'hobbies':
+          case "hobbies":
             sectionHeight += 50; // Fixed height
             break;
           default:
@@ -378,21 +387,24 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
         }
 
         // Check if section fits on current page
-        if (currentPageHeight + sectionHeight > MAX_CONTENT_HEIGHT && pages[currentPage].length > 0) {
+        if (
+          currentPageHeight + sectionHeight > MAX_CONTENT_HEIGHT &&
+          pages[currentPage].length > 0
+        ) {
           // Move to next page
           currentPage++;
           pages[currentPage] = [];
           currentPageHeight = 0;
         }
-        
+
         // Add section to current page
         pages[currentPage].push(section);
         currentPageHeight += sectionHeight;
       });
-      
+
       setPageContents(pages);
     };
-    
+
     distributeContent();
   }, [sections, userData, MAX_CONTENT_HEIGHT]);
 
@@ -400,14 +412,20 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
   return (
     <div className="resume-container">
       {pageContents.map((pageSections, pageIndex) => (
-        <div 
-          key={pageIndex} 
+        <div
+          key={pageIndex}
           className={`${containerClass} h-[297mm] mb-8 page-break-after relative overflow-hidden`}
         >
           {/* Header only on first page */}
           {pageIndex === 0 && (
-            <header className="p-8 border-b" style={{ borderColor: primaryColor }}>
-              <h1 className="text-3xl font-bold mb-2" style={{ color: primaryColor }}>
+            <header
+              className="p-8 border-b"
+              style={{ borderColor: primaryColor }}
+            >
+              <h1
+                className="text-3xl font-bold mb-2"
+                style={{ color: primaryColor }}
+              >
                 {userData.name}
               </h1>
               <div className="text-gray-600 space-y-1">
@@ -439,7 +457,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
               </section>
             ))}
           </main>
-          
+
           {/* Page footer with page number */}
           <footer className="absolute bottom-4 right-8 text-gray-400 text-sm">
             Page {pageIndex + 1} of {pageContents.length}
@@ -450,7 +468,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
   );
 };
 
-// 2. Modern Professional Template
+// Enhanced Modern Professional Template with pagination support
 const ModernProfessional: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
@@ -467,193 +485,423 @@ const ModernProfessional: React.FC<BaseTemplateProps> = ({
     );
   }
 
-  return (
-    <div className={containerClass}>
-      {/* Header with primary color */}
-      <div className="h-8" style={{ backgroundColor: primaryColor }}></div>
-      <div className="grid grid-cols-3 gap-8 p-8">
-        {/* Left Section (Main Content) */}
-        <div className="col-span-2">
-          <h1 className="text-4xl font-bold mb-2">{userData.name}</h1>
-          <p className="text-xl text-gray-600 mb-6">
-            {userData.aspiringRoles && userData.aspiringRoles.length > 0
-              ? userData.aspiringRoles[0]
-              : "Professional"}
-          </p>
-
-          {/* About Me */}
-          {userData.aboutMe && (
-            <section className="mb-8">
-              <h2
-                className="text-xl font-semibold mb-4"
-                style={{ color: primaryColor }}
-              >
-                About Me
-              </h2>
-              <p className="text-gray-700">{userData.aboutMe}</p>
-            </section>
-          )}
-
-          {/* Experience */}
-          {userData.experience && userData.experience.length > 0 && (
-            <section className="mb-8">
-              <h2
-                className="text-xl font-semibold mb-4"
-                style={{ color: primaryColor }}
-              >
-                Experience
-              </h2>
-              <div className="space-y-6">
-                {userData.experience.map((exp, index) => (
-                  <div key={index}>
-                    <h3 className="font-semibold">{exp.company}</h3>
-                    <p className="text-gray-600 mb-2">
-                      {exp.jobTitle} • {formatDate(exp.startDate)} -{" "}
-                      {formatDate(exp.endDate)}
-                    </p>
-                    <ul className="list-disc ml-4 text-gray-700">
-                      <li>{exp.description}</li>
-                    </ul>
-                  </div>
-                ))}
+  // Define main content sections
+  const mainSections = React.useMemo(() => {
+    return [
+      {
+        id: "about",
+        title: "About Me",
+        condition: !!userData.aboutMe,
+        content: () => <p className="text-gray-700">{userData.aboutMe}</p>,
+      },
+      {
+        id: "experience",
+        title: "Experience",
+        condition: userData.experience && userData.experience.length > 0,
+        content: () => (
+          <div className="space-y-6">
+            {userData.experience.map((exp, index) => (
+              <div key={index}>
+                <h3 className="font-semibold">{exp.company}</h3>
+                <p className="text-gray-600 mb-2">
+                  {exp.jobTitle} • {formatDate(exp.startDate)} -{" "}
+                  {exp.endDate === "Present"
+                    ? "Present"
+                    : formatDate(exp.endDate)}
+                </p>
+                <p className="text-gray-700">{exp.description}</p>
               </div>
-            </section>
-          )}
-
-          {/* Education */}
-          {userData.education && userData.education.length > 0 && (
-            <section className="mb-8">
-              <h2
-                className="text-xl font-semibold mb-4"
-                style={{ color: primaryColor }}
-              >
-                Education
-              </h2>
-              {userData.education.map((edu, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold">{edu.institution}</h3>
-                  <p className="text-gray-600 mb-2">
-                    {edu.degree} <br />• {edu.year_of_start} -{" "}
-                    {edu.year_of_completion}
+            ))}
+          </div>
+        ),
+      },
+      {
+        id: "education",
+        title: "Education",
+        condition: userData.education && userData.education.length > 0,
+        content: () => (
+          <div className="space-y-4">
+            {userData.education.map((edu, index) => (
+              <div key={index}>
+                <h3 className="font-semibold">{edu.institution}</h3>
+                <p className="text-gray-600 mb-2">
+                  {edu.degree} <br />• {edu.year_of_start} -{" "}
+                  {edu.year_of_completion}
+                </p>
+              </div>
+            ))}
+          </div>
+        ),
+      },
+      {
+        id: "projects",
+        title: "Projects",
+        condition: userData.projects && userData.projects.length > 0,
+        content: () => (
+          <div className="space-y-6">
+            {userData.projects.map((project, index) => (
+              <div key={index}>
+                <h3 className="font-semibold">{project.name}</h3>
+                <p className="text-gray-600 mb-2">
+                  {formatDate(project.startDate)} -{" "}
+                  {project.endDate === "Present"
+                    ? "Present"
+                    : formatDate(project.endDate)}
+                </p>
+                <p className="text-gray-700 mb-1">{project.description}</p>
+                {project.techStack && (
+                  <p className="text-gray-700">
+                    <span className="font-medium">Tech Stack:</span>{" "}
+                    {project.techStack}
                   </p>
-                </div>
-              ))}
-            </section>
-          )}
-        </div>
+                )}
+                {project.link && (
+                  <p className="mt-1">
+                    <a
+                      href={project.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      Project Link
+                    </a>
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        ),
+      },
+      {
+        id: "certifications",
+        title: "Certifications",
+        condition:
+          userData.certifications && userData.certifications.length > 0,
+        content: () => (
+          <div className="space-y-4">
+            {userData.certifications.map((cert, index) => (
+              <div key={index}>
+                <h3 className="font-semibold">{cert.name}</h3>
+                <p className="text-gray-600 mb-1">
+                  {cert.organization} • {cert.year}
+                </p>
+                {cert.credentialUrl && (
+                  <p>
+                    <a
+                      href={cert.credentialUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Credential ID: {cert.credentialId}
+                    </a>
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        ),
+      },
+    ].filter((section) => section.condition);
+  }, [userData]);
 
-        {/* Right Sidebar */}
-        <div className="space-y-8">
-          {/* Contact Information */}
-          <section>
-            <h2
-              className="text-xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Contact
-            </h2>
-            <div className="space-y-2 text-gray-700">
+  // Define sidebar sections
+  const sidebarSections = React.useMemo(() => {
+    return [
+      {
+        id: "contact",
+        title: "Contact",
+        content: () => (
+          <div className="space-y-2 text-gray-700">
+            <p>
+              <a
+                href={`mailto:${userData.email}`}
+                className="text-blue-600 hover:underline"
+              >
+                {userData.email}
+              </a>
+            </p>
+            {userData.linkedIn && (
               <p>
                 <a
-                  href={`mailto:${userData.email}`}
+                  href={userData.linkedIn}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  {userData.email}
+                  LinkedIn
                 </a>
               </p>
-              {userData.linkedIn && (
-                <p>
-                  <a
-                    href={userData.linkedIn}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+            )}
+            {userData.github && (
+              <p>
+                <a
+                  href={userData.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  GitHub
+                </a>
+              </p>
+            )}
+          </div>
+        ),
+      },
+      {
+        id: "skills",
+        title: "Skills",
+        condition: userData.skills && userData.skills.length > 0,
+        content: () => (
+          <div className="space-y-2">
+            {userData.skills.map((skill, index) => (
+              <div
+                key={index}
+                className="p-2 rounded"
+                style={{
+                  backgroundColor: `${primaryColor}10`,
+                  color: primaryColor,
+                }}
+              >
+                {skill.name}
+              </div>
+            ))}
+          </div>
+        ),
+      },
+      {
+        id: "languages",
+        title: "Languages",
+        condition: userData.languages && userData.languages.length > 0,
+        content: () => (
+          <ul className="list-disc ml-4 text-gray-700">
+            {userData.languages.map((lang, index) => (
+              <li key={index}>
+                {lang.language} - {lang.proficiency}
+              </li>
+            ))}
+          </ul>
+        ),
+      },
+      {
+        id: "hobbies",
+        title: "Hobbies",
+        condition: userData.hobbies && userData.hobbies.length > 0,
+        content: () => (
+          <ul className="list-disc ml-4 text-gray-700">
+            {userData.hobbies.map((hobby, index) => (
+              <li key={index}>{hobby}</li>
+            ))}
+          </ul>
+        ),
+      },
+    ].filter(
+      (section) => section.id === "contact" || section.condition === true
+    );
+  }, [userData, primaryColor]);
+
+  // Maximum content height per page (in px)
+  const A4_PAGE_HEIGHT = 1123; // Roughly 297mm in pixels
+  const HEADER_HEIGHT = 140; // Header + margin
+  const FOOTER_HEIGHT = 30; // Footer
+  const PAGE_PADDING = 64; // 32px top + 32px bottom
+  const MAX_CONTENT_HEIGHT =
+    A4_PAGE_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT - PAGE_PADDING;
+
+  // State to track pages and their content
+  const [mainPageContents, setMainPageContents] = React.useState<any[]>([]);
+  const [sidebarPageContents, setSidebarPageContents] = React.useState<any[]>(
+    []
+  );
+
+  // Distribute sections across pages
+  React.useEffect(() => {
+    // Main content distribution
+    const distributeMainContent = () => {
+      const pages: any[] = [[]];
+      let currentPage = 0;
+      let currentPageHeight = 0;
+
+      if (currentPage === 0) {
+        currentPageHeight += HEADER_HEIGHT;
+      }
+
+      mainSections.forEach((section) => {
+        // Estimate section height based on content
+        let sectionHeight = 60; // Base height for title + margins
+
+        switch (section.id) {
+          case "about":
+            sectionHeight += userData.aboutMe.length / 4; // Estimate based on text length
+            break;
+          case "experience":
+            sectionHeight += userData.experience.length * 130; // Height per item
+            break;
+          case "education":
+            sectionHeight += userData.education.length * 100; // Height per item
+            break;
+          case "projects":
+            sectionHeight += userData.projects.length * 160; // Height per item
+            break;
+          case "certifications":
+            sectionHeight += userData.certifications.length * 110; // Height per item
+            break;
+          default:
+            sectionHeight += 100; // Default
+        }
+
+        // Check if section fits on current page
+        if (
+          currentPageHeight + sectionHeight > MAX_CONTENT_HEIGHT &&
+          pages[currentPage].length > 0
+        ) {
+          // Create new page
+          currentPage++;
+          pages[currentPage] = [];
+          currentPageHeight = 0;
+        }
+
+        // Add section to current page
+        pages[currentPage].push(section);
+        currentPageHeight += sectionHeight;
+      });
+
+      setMainPageContents(pages);
+    };
+
+    // Sidebar content distribution
+    const distributeSidebarContent = () => {
+      const pages: any[] = [[]];
+      let currentPage = 0;
+      let currentPageHeight = 0;
+
+      if (currentPage === 0) {
+        currentPageHeight += HEADER_HEIGHT;
+      }
+
+      sidebarSections.forEach((section) => {
+        // Estimate section height
+        let sectionHeight = 60; // Base height
+
+        switch (section.id) {
+          case "contact":
+            sectionHeight += 80; // Fixed height estimate
+            break;
+          case "skills":
+            sectionHeight += userData.skills.length * 40; // Height per skill
+            break;
+          case "languages":
+            sectionHeight += userData.languages.length * 25; // Height per language
+            break;
+          case "hobbies":
+            sectionHeight += userData.hobbies.length * 25; // Height per hobby
+            break;
+          default:
+            sectionHeight += 60; // Default
+        }
+
+        // Check if section fits on current page
+        if (
+          currentPageHeight + sectionHeight > MAX_CONTENT_HEIGHT &&
+          pages[currentPage].length > 0
+        ) {
+          // Create new page
+          currentPage++;
+          pages[currentPage] = [];
+          currentPageHeight = 0;
+        }
+
+        // Add section to current page
+        pages[currentPage].push(section);
+        currentPageHeight += sectionHeight;
+      });
+
+      setSidebarPageContents(pages);
+    };
+
+    distributeMainContent();
+    distributeSidebarContent();
+  }, [mainSections, sidebarSections, userData, MAX_CONTENT_HEIGHT]);
+
+  // Calculate total pages needed
+  const totalPages = Math.max(
+    mainPageContents.length,
+    sidebarPageContents.length
+  );
+
+  // Render the resume with multiple pages
+  return (
+    <div className="resume-container">
+      {Array.from({ length: totalPages }).map((_, pageIndex) => (
+        <div
+          key={pageIndex}
+          className={`${containerClass} h-[297mm] mb-8 page-break-after relative overflow-hidden`}
+        >
+          {/* Top colored bar */}
+          <div className="h-8" style={{ backgroundColor: primaryColor }}></div>
+
+          {/* Only show name and title on first page */}
+          {pageIndex === 0 && (
+            <div className="px-8 pt-8">
+              <h1 className="text-4xl font-bold mb-2">{userData.name}</h1>
+              <p className="text-xl text-gray-600 mb-6">
+                {userData.aspiringRoles && userData.aspiringRoles.length > 0
+                  ? userData.aspiringRoles[0]
+                  : "Professional"}
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-3 gap-8 p-8 pt-4">
+            {/* Left Section (Main Content) */}
+            <div className="col-span-2">
+              {mainPageContents[pageIndex]?.map(
+                (section: any, sectionIndex: number) => (
+                  <section
+                    key={`main-${pageIndex}-${sectionIndex}`}
+                    className="mb-8"
                   >
-                    LinkedIn
-                  </a>
-                </p>
-              )}
-              {userData.github && (
-                <p>
-                  <a
-                    href={userData.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    GitHub
-                  </a>
-                </p>
+                    <h2
+                      className="text-xl font-semibold mb-4"
+                      style={{ color: primaryColor }}
+                    >
+                      {section.title}
+                    </h2>
+                    {section.content()}
+                  </section>
+                )
               )}
             </div>
-          </section>
 
-          {/* Skills */}
-          {userData.skills && userData.skills.length > 0 && (
-            <section>
-              <h2
-                className="text-xl font-semibold mb-4"
-                style={{ color: primaryColor }}
-              >
-                Skills
-              </h2>
-              <div className="space-y-2">
-                {userData.skills.map((skill, index) => (
-                  <div
-                    key={index}
-                    className="p-2 rounded"
-                    style={{
-                      backgroundColor: `${primaryColor}10`,
-                      color: primaryColor,
-                    }}
-                  >
-                    {skill.name}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+            {/* Right Sidebar */}
+            <div className="space-y-8">
+              {sidebarPageContents[pageIndex]?.map(
+                (section: any, sectionIndex: number) => (
+                  <section key={`sidebar-${pageIndex}-${sectionIndex}`}>
+                    <h2
+                      className="text-xl font-semibold mb-4"
+                      style={{ color: primaryColor }}
+                    >
+                      {section.title}
+                    </h2>
+                    {section.content()}
+                  </section>
+                )
+              )}
+            </div>
+          </div>
 
-          {/* Hobbies */}
-          {userData.hobbies && userData.hobbies.length > 0 && (
-            <section>
-              <h2
-                className="text-xl font-semibold mb-4"
-                style={{ color: primaryColor }}
-              >
-                Hobbies
-              </h2>
-              <ul className="list-disc ml-4 text-gray-700">
-                {userData.hobbies.map((hobby, index) => (
-                  <li key={index}>{hobby}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Languages */}
-          {userData.languages && userData.languages.length > 0 && (
-            <section>
-              <h2
-                className="text-xl font-semibold mb-4"
-                style={{ color: primaryColor }}
-              >
-                Languages
-              </h2>
-              <ul className="list-disc ml-4 text-gray-700">
-                {userData.languages.map((lang, index) => (
-                  <li key={index}>
-                    {lang.language} - {lang.proficiency}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          {/* Page footer with page number */}
+          <footer className="absolute bottom-4 right-8 text-gray-400 text-sm">
+            Page {pageIndex + 1} of {totalPages}
+          </footer>
         </div>
-      </div>
+      ))}
     </div>
   );
 };
+
+// 3. Bold Creative Template
 
 const BoldCreative: React.FC<BaseTemplateProps> = ({
   font,
@@ -1212,7 +1460,214 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
   );
 };
 
-// 4. Minimalist Technical Template
+// // 4. Minimalist Technical Template
+// const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
+//   font,
+//   primaryColor,
+//   preview = false,
+//   userData,
+// }) => {
+//   const containerClass = getA4ContainerClass(font, preview);
+
+//   if (!userData) {
+//     return (
+//       <div className={containerClass}>
+//         <div className="p-8">Loading...</div>
+//       </div>
+//     );
+//   }
+
+//   // Group skills by type
+//   const groupedSkills: {
+//     Languages: string[];
+//     Frameworks: string[];
+//     Tools: string[];
+//     Databases: string[];
+//   } = {
+//     Languages: [],
+//     Frameworks: [],
+//     Tools: [],
+//     Databases: [],
+//   };
+
+//   if (userData.skills && userData.skills.length > 0) {
+//     userData.skills.forEach((skill) => {
+//       if (
+//         skill.name.toLowerCase().includes("python") ||
+//         skill.name.toLowerCase().includes("java") ||
+//         skill.name.toLowerCase().includes("script")
+//       ) {
+//         groupedSkills.Languages.push(skill.name);
+//       } else if (
+//         skill.name.toLowerCase().includes("react") ||
+//         skill.name.toLowerCase().includes("node") ||
+//         skill.name.toLowerCase().includes("framework")
+//       ) {
+//         groupedSkills.Frameworks.push(skill.name);
+//       } else if (
+//         skill.name.toLowerCase().includes("git") ||
+//         skill.name.toLowerCase().includes("docker")
+//       ) {
+//         groupedSkills.Tools.push(skill.name);
+//       } else if (
+//         skill.name.toLowerCase().includes("sql") ||
+//         skill.name.toLowerCase().includes("mongo")
+//       ) {
+//         groupedSkills.Databases.push(skill.name);
+//       } else {
+//         // Default to Tools category
+//         groupedSkills.Tools.push(skill.name);
+//       }
+//     });
+//   }
+
+//   return (
+//     <div className={containerClass}>
+//       <div className="p-8">
+//         {/* Header */}
+//         <header className="mb-8 text-center">
+//           <h1
+//             className="text-4xl font-bold mb-2"
+//             style={{ color: primaryColor }}
+//           >
+//             {userData.name.toUpperCase()}
+//           </h1>
+//           <p className="text-xl mb-4">
+//             {userData.aspiringRoles && userData.aspiringRoles.length > 0
+//               ? userData.aspiringRoles[0]
+//               : "Software Engineer"}
+//           </p>
+//           <div className="flex justify-center space-x-4 text-sm text-gray-600">
+//             <span>{userData.email}</span>
+//             <span>•</span>
+//             {userData.linkedIn && (
+//               <>
+//                 <span>{userData.linkedIn}</span>
+//                 <span>•</span>
+//               </>
+//             )}
+//             {userData.github && <span>{userData.github}</span>}
+//           </div>
+//         </header>
+
+//         {/* Technical Skills */}
+//         <section className="mb-8">
+//           <h2
+//             className="text-lg font-bold mb-4 uppercase tracking-wider"
+//             style={{ color: primaryColor }}
+//           >
+//             Technical Skills
+//           </h2>
+//           <div className="grid grid-cols-2 gap-4">
+//             {Object.entries(groupedSkills).map(
+//               ([category, skills]) =>
+//                 skills.length > 0 && (
+//                   <div key={category}>
+//                     <h3 className="font-semibold mb-2">{category}</h3>
+//                     <p className="text-gray-700">{skills.join(", ")}</p>
+//                   </div>
+//                 )
+//             )}
+//           </div>
+//         </section>
+
+//         {/* Experience */}
+//         {userData.experience && userData.experience.length > 0 && (
+//           <section className="mb-8">
+//             <h2
+//               className="text-lg font-bold mb-4 uppercase tracking-wider"
+//               style={{ color: primaryColor }}
+//             >
+//               Experience
+//             </h2>
+//             <div className="space-y-6">
+//               {userData.experience.map((exp, index) => (
+//                 <div key={index}>
+//                   <div className="flex justify-between items-center">
+//                     <h3 className="font-semibold">{exp.jobTitle}</h3>
+//                     <span>
+//                       {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+//                     </span>
+//                   </div>
+//                   <p className="text-gray-600 mb-2">{exp.company}</p>
+//                   <ul className="list-disc ml-4 text-gray-700">
+//                     <li>{exp.description}</li>
+//                   </ul>
+//                 </div>
+//               ))}
+//             </div>
+//           </section>
+//         )}
+
+//         {/* Projects */}
+//         {userData.projects && userData.projects.length > 0 && (
+//           <section className="mb-8">
+//             <h2
+//               className="text-lg font-bold mb-4 uppercase tracking-wider"
+//               style={{ color: primaryColor }}
+//             >
+//               Technical Projects
+//             </h2>
+//             <div className="space-y-4">
+//               {userData.projects.map((project, index) => (
+//                 <div key={index}>
+//                   <h3 className="font-semibold">{project.name}</h3>
+//                   <p className="text-gray-700 mb-2">{project.techStack}</p>
+//                   <p className="text-gray-700">{project.description}</p>
+//                 </div>
+//               ))}
+//             </div>
+//           </section>
+//         )}
+
+//         {/* Education */}
+//         {userData.education && userData.education.length > 0 && (
+//           <section>
+//             <h2
+//               className="text-lg font-bold mb-4 uppercase tracking-wider"
+//               style={{ color: primaryColor }}
+//             >
+//               Education
+//             </h2>
+//             {userData.education.map((edu, index) => (
+//               <div key={index}>
+//                 <div className="flex justify-between items-center">
+//                   <h3 className="font-semibold">{edu.degree}</h3>
+//                   <span>
+//                     {edu.year_of_start} - {edu.year_of_completion}
+//                   </span>
+//                 </div>
+//                 <p className="text-gray-600">{edu.institution}</p>
+//               </div>
+//             ))}
+//           </section>
+//         )}
+
+//         {/* Certifications */}
+//         {userData.certifications && userData.certifications.length > 0 && (
+//           <section className="mt-8">
+//             <h2
+//               className="text-lg font-bold mb-4 uppercase tracking-wider"
+//               style={{ color: primaryColor }}
+//             >
+//               Certifications
+//             </h2>
+//             {userData.certifications.map((cert, index) => (
+//               <div key={index} className="mb-2">
+//                 <div className="flex justify-between items-center">
+//                   <h3 className="font-semibold">{cert.name}</h3>
+//                   <span>{cert.year}</span>
+//                 </div>
+//                 <p className="text-gray-600">{cert.organization}</p>
+//               </div>
+//             ))}
+//           </section>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
 const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
@@ -1220,7 +1675,363 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
   userData,
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
+  const [pages, setPages] = React.useState<React.ReactNode[]>([]);
+  
+  // A4 page can fit approximately 50-60 lines of content with normal font size
+  const LINES_PER_A4_PAGE = 55;
 
+  React.useEffect(() => {
+    if (userData) {
+      organizeContent();
+    }
+  }, [userData]);
+
+  // Function to estimate height of each section in lines
+  const estimateSectionHeight = (sectionType: string, data: any) => {
+    switch(sectionType) {
+      case 'header':
+        return 8; // Fixed header size
+      case 'skills':
+        // Base + lines for each skill category with entries
+        const skillCategories = Object.values(data).filter(cat => (cat as string[]).length > 0).length;
+        return 4 + Math.ceil(skillCategories / 2) * 4;
+      case 'experience':
+        // Base + 7 lines per experience entry (title, company, dates, description)
+        return data?.length ? 4 + (data.length * 7) : 0;
+      case 'projects':
+        // Base + 6 lines per project
+        return data?.length ? 4 + (data.length * 6) : 0;
+      case 'education':
+        // Base + 4 lines per education entry
+        return data?.length ? 4 + (data.length * 4) : 0;
+      case 'certifications':
+        // Base + 3 lines per certification
+        return data?.length ? 4 + (data.length * 3) : 0;
+      default:
+        return 0;
+    }
+  };
+
+  // Group skills by type
+  const getGroupedSkills = () => {
+    const groupedSkills: {
+      Languages: string[];
+      Frameworks: string[];
+      Tools: string[];
+      Databases: string[];
+    } = {
+      Languages: [],
+      Frameworks: [],
+      Tools: [],
+      Databases: [],
+    };
+
+    if (userData?.skills && userData.skills.length > 0) {
+      userData.skills.forEach((skill) => {
+        if (
+          skill.name.toLowerCase().includes("python") ||
+          skill.name.toLowerCase().includes("java") ||
+          skill.name.toLowerCase().includes("script")
+        ) {
+          groupedSkills.Languages.push(skill.name);
+        } else if (
+          skill.name.toLowerCase().includes("react") ||
+          skill.name.toLowerCase().includes("node") ||
+          skill.name.toLowerCase().includes("framework")
+        ) {
+          groupedSkills.Frameworks.push(skill.name);
+        } else if (
+          skill.name.toLowerCase().includes("git") ||
+          skill.name.toLowerCase().includes("docker")
+        ) {
+          groupedSkills.Tools.push(skill.name);
+        } else if (
+          skill.name.toLowerCase().includes("sql") ||
+          skill.name.toLowerCase().includes("mongo")
+        ) {
+          groupedSkills.Databases.push(skill.name);
+        } else {
+          // Default to Tools category
+          groupedSkills.Tools.push(skill.name);
+        }
+      });
+    }
+
+    return groupedSkills;
+  };
+
+  // Function to organize content into pages with better page balancing
+  const organizeContent = () => {
+    if (!userData) return;
+    
+    const groupedSkills = getGroupedSkills();
+    
+    // Define sections and their data
+    const sectionsConfig = [
+      { type: 'header', render: renderHeader, data: userData },
+      { type: 'skills', render: renderSkills, data: groupedSkills },
+      { type: 'experience', render: renderExperience, data: userData.experience },
+      { type: 'projects', render: renderProjects, data: userData.projects },
+      { type: 'education', render: renderEducation, data: userData.education },
+      { type: 'certifications', render: renderCertifications, data: userData.certifications }
+    ];
+    
+    // Filter out empty sections
+    const validSections = sectionsConfig.filter(section => {
+      if (section.type === 'header') return true;
+      if (section.type === 'skills') {
+        const skillsData = section.data as { [key: string]: string[] };
+        return Object.values(skillsData).some(category => category.length > 0);
+      }
+      return Array.isArray(section.data) && section.data.length > 0;
+    });
+    
+    const pagesContent: React.ReactNode[] = [];
+    let currentPageSections: React.ReactNode[] = [];
+    let currentPageHeight = 0;
+    
+    // Distribute sections across pages
+    validSections.forEach(section => {
+      const sectionHeight = estimateSectionHeight(section.type, section.data);
+      
+      // If adding this section would exceed page height and we already have content,
+      // finalize current page and start a new one
+      if (currentPageHeight + sectionHeight > LINES_PER_A4_PAGE && currentPageSections.length > 0) {
+        pagesContent.push(renderPage(currentPageSections));
+        currentPageSections = [];
+        currentPageHeight = 0;
+      }
+      
+      // If a single section is too big for a page, it will get its own page
+      const renderedSection = section.render();
+      if (renderedSection) {
+        currentPageSections.push(renderedSection);
+        currentPageHeight += sectionHeight;
+      }
+    });
+    
+    // Add the last page if there's content left
+    if (currentPageSections.length > 0) {
+      pagesContent.push(renderPage(currentPageSections));
+    }
+    
+    setPages(pagesContent);
+  };
+
+  // Render a page with given sections
+  const renderPage = (sections: React.ReactNode[]) => (
+    <div className="p-8">
+      {sections}
+    </div>
+  );
+
+  // Header Section
+  const renderHeader = () => (
+    <header className="mb-8 text-center">
+      <h1
+        className="text-4xl font-bold mb-2"
+        style={{ color: primaryColor }}
+      >
+        {userData?.name?.toUpperCase() || ""}
+      </h1>
+      <p className="text-xl mb-4">
+        {userData?.aspiringRoles && userData.aspiringRoles.length > 0
+          ? userData.aspiringRoles[0]
+          : "Software Engineer"}
+      </p>
+      <div className="flex justify-center space-x-4 text-sm text-gray-600">
+       {userData && <span>{userData.email}</span>}
+        <span>•</span>
+        {userData && userData.linkedIn && (
+          <>
+            <span>
+              <a 
+                href={userData.linkedIn.startsWith("http") ? userData.linkedIn : `https://www.linkedin.com/in/${userData.linkedIn}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: primaryColor }}
+                className="truncate inline-block max-w-xs"
+              >
+                {userData.linkedIn.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, "")}
+              </a>
+            </span>
+            <span>•</span>
+          </>
+        )}
+        {userData && userData.github && (
+          <span>
+            <a 
+              href={userData.github.startsWith("http") ? userData.github : `https://github.com/${userData.github}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: primaryColor }}
+              className="truncate inline-block max-w-xs"
+            >
+              {userData.github.replace(/^https?:\/\/(www\.)?github\.com\//, "")}
+            </a>
+          </span>
+        )}
+      </div>
+    </header>
+  );
+
+  // Technical Skills Section
+  const renderSkills = () => {
+    const groupedSkills = getGroupedSkills();
+    const hasSkills = Object.values(groupedSkills).some(category => category.length > 0);
+    
+    if (!hasSkills) return null;
+    
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-lg font-bold mb-4 uppercase tracking-wider"
+          style={{ color: primaryColor }}
+        >
+          Technical Skills
+        </h2>
+        <div className="grid grid-cols-2 gap-4">
+          {Object.entries(groupedSkills).map(
+            ([category, skills]) =>
+              skills.length > 0 && (
+                <div key={category}>
+                  <h3 className="font-semibold mb-2">{category}</h3>
+                  <p className="text-gray-700">{skills.join(", ")}</p>
+                </div>
+              )
+          )}
+        </div>
+      </section>
+    );
+  };
+
+  // Experience Section
+  const renderExperience = () => {
+    if (!userData||!userData.experience || userData.experience.length === 0) return null;
+    
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-lg font-bold mb-4 uppercase tracking-wider"
+          style={{ color: primaryColor }}
+        >
+          Experience
+        </h2>
+        <div className="space-y-6">
+          {userData.experience.map((exp, index) => (
+            <div key={index}>
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold">{exp.jobTitle}</h3>
+                <span>
+                  {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
+                </span>
+              </div>
+              <p className="text-gray-600 mb-2">{exp.company}</p>
+              <ul className="list-disc ml-4 text-gray-700">
+                <li>{exp.description}</li>
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Projects Section
+  const renderProjects = () => {
+    if (!userData||!userData.projects || userData.projects.length === 0) return null;
+    
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-lg font-bold mb-4 uppercase tracking-wider"
+          style={{ color: primaryColor }}
+        >
+          Technical Projects
+        </h2>
+        <div className="space-y-4">
+          {userData.projects.map((project, index) => (
+            <div key={index}>
+              <h3 className="font-semibold">{project.name}</h3>
+              <p className="text-gray-700 mb-2">{project.techStack}</p>
+              <p className="text-gray-700">{project.description}</p>
+              {project.link && (
+                <p className="mt-1">
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: primaryColor }}
+                    className="text-sm"
+                  >
+                    View Project
+                  </a>
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Education Section
+  const renderEducation = () => {
+    if (!userData||!userData.education || userData.education.length === 0) return null;
+    
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-lg font-bold mb-4 uppercase tracking-wider"
+          style={{ color: primaryColor }}
+        >
+          Education
+        </h2>
+        <div className="space-y-4">
+          {userData.education.map((edu, index) => (
+            <div key={index}>
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold">{edu.degree}</h3>
+                <span>
+                  {edu.year_of_start} - {edu.year_of_completion}
+                </span>
+              </div>
+              <p className="text-gray-600">{edu.institution}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Certifications Section
+  const renderCertifications = () => {
+    if (!userData||!userData.certifications || userData.certifications.length === 0) return null;
+    
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-lg font-bold mb-4 uppercase tracking-wider"
+          style={{ color: primaryColor }}
+        >
+          Certifications
+        </h2>
+        <div className="space-y-3">
+          {userData.certifications.map((cert, index) => (
+            <div key={index}>
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold">{cert.name}</h3>
+                <span>{cert.year}</span>
+              </div>
+              <p className="text-gray-600">{cert.organization}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Loading state
   if (!userData) {
     return (
       <div className={containerClass}>
@@ -1229,193 +2040,30 @@ const MinimalistTechnical: React.FC<BaseTemplateProps> = ({
     );
   }
 
-  // Group skills by type
-  const groupedSkills: {
-    Languages: string[];
-    Frameworks: string[];
-    Tools: string[];
-    Databases: string[];
-  } = {
-    Languages: [],
-    Frameworks: [],
-    Tools: [],
-    Databases: [],
-  };
-
-  if (userData.skills && userData.skills.length > 0) {
-    userData.skills.forEach((skill) => {
-      if (
-        skill.name.toLowerCase().includes("python") ||
-        skill.name.toLowerCase().includes("java") ||
-        skill.name.toLowerCase().includes("script")
-      ) {
-        groupedSkills.Languages.push(skill.name);
-      } else if (
-        skill.name.toLowerCase().includes("react") ||
-        skill.name.toLowerCase().includes("node") ||
-        skill.name.toLowerCase().includes("framework")
-      ) {
-        groupedSkills.Frameworks.push(skill.name);
-      } else if (
-        skill.name.toLowerCase().includes("git") ||
-        skill.name.toLowerCase().includes("docker")
-      ) {
-        groupedSkills.Tools.push(skill.name);
-      } else if (
-        skill.name.toLowerCase().includes("sql") ||
-        skill.name.toLowerCase().includes("mongo")
-      ) {
-        groupedSkills.Databases.push(skill.name);
-      } else {
-        // Default to Tools category
-        groupedSkills.Tools.push(skill.name);
-      }
-    });
+  // Wait for pages to be generated
+  if (pages.length === 0) {
+    return (
+      <div className={containerClass}>
+        <div className="p-8">Organizing content...</div>
+      </div>
+    );
   }
 
   return (
-    <div className={containerClass}>
-      <div className="p-8">
-        {/* Header */}
-        <header className="mb-8 text-center">
-          <h1
-            className="text-4xl font-bold mb-2"
-            style={{ color: primaryColor }}
-          >
-            {userData.name.toUpperCase()}
-          </h1>
-          <p className="text-xl mb-4">
-            {userData.aspiringRoles && userData.aspiringRoles.length > 0
-              ? userData.aspiringRoles[0]
-              : "Software Engineer"}
-          </p>
-          <div className="flex justify-center space-x-4 text-sm text-gray-600">
-            <span>{userData.email}</span>
-            <span>•</span>
-            {userData.linkedIn && (
-              <>
-                <span>{userData.linkedIn}</span>
-                <span>•</span>
-              </>
-            )}
-            {userData.github && <span>{userData.github}</span>}
-          </div>
-        </header>
-
-        {/* Technical Skills */}
-        <section className="mb-8">
-          <h2
-            className="text-lg font-bold mb-4 uppercase tracking-wider"
-            style={{ color: primaryColor }}
-          >
-            Technical Skills
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            {Object.entries(groupedSkills).map(
-              ([category, skills]) =>
-                skills.length > 0 && (
-                  <div key={category}>
-                    <h3 className="font-semibold mb-2">{category}</h3>
-                    <p className="text-gray-700">{skills.join(", ")}</p>
-                  </div>
-                )
-            )}
-          </div>
-        </section>
-
-        {/* Experience */}
-        {userData.experience && userData.experience.length > 0 && (
-          <section className="mb-8">
-            <h2
-              className="text-lg font-bold mb-4 uppercase tracking-wider"
-              style={{ color: primaryColor }}
-            >
-              Experience
-            </h2>
-            <div className="space-y-6">
-              {userData.experience.map((exp, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">{exp.jobTitle}</h3>
-                    <span>
-                      {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 mb-2">{exp.company}</p>
-                  <ul className="list-disc ml-4 text-gray-700">
-                    <li>{exp.description}</li>
-                  </ul>
-                </div>
-              ))}
+    <div className="flex flex-col gap-8">
+      {pages.map((page, index) => (
+        <div 
+          key={index} 
+          className={`${containerClass} mb-6 print:mb-0 ${index < pages.length - 1 ? 'print:page-break-after-always' : ''}`}
+        >
+          {page}
+          {index < pages.length - 1 && (
+            <div className="text-right text-gray-500 text-sm pr-4 pb-2">
+              Page {index + 1} of {pages.length}
             </div>
-          </section>
-        )}
-
-        {/* Projects */}
-        {userData.projects && userData.projects.length > 0 && (
-          <section className="mb-8">
-            <h2
-              className="text-lg font-bold mb-4 uppercase tracking-wider"
-              style={{ color: primaryColor }}
-            >
-              Technical Projects
-            </h2>
-            <div className="space-y-4">
-              {userData.projects.map((project, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold">{project.name}</h3>
-                  <p className="text-gray-700 mb-2">{project.techStack}</p>
-                  <p className="text-gray-700">{project.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Education */}
-        {userData.education && userData.education.length > 0 && (
-          <section>
-            <h2
-              className="text-lg font-bold mb-4 uppercase tracking-wider"
-              style={{ color: primaryColor }}
-            >
-              Education
-            </h2>
-            {userData.education.map((edu, index) => (
-              <div key={index}>
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{edu.degree}</h3>
-                  <span>
-                    {edu.year_of_start} - {edu.year_of_completion}
-                  </span>
-                </div>
-                <p className="text-gray-600">{edu.institution}</p>
-              </div>
-            ))}
-          </section>
-        )}
-
-        {/* Certifications */}
-        {userData.certifications && userData.certifications.length > 0 && (
-          <section className="mt-8">
-            <h2
-              className="text-lg font-bold mb-4 uppercase tracking-wider"
-              style={{ color: primaryColor }}
-            >
-              Certifications
-            </h2>
-            {userData.certifications.map((cert, index) => (
-              <div key={index} className="mb-2">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{cert.name}</h3>
-                  <span>{cert.year}</span>
-                </div>
-                <p className="text-gray-600">{cert.organization}</p>
-              </div>
-            ))}
-          </section>
-        )}
-      </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
@@ -1428,7 +2076,372 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
   userData,
 }) => {
   const containerClass = getA4ContainerClass(font, preview);
+  const [pages, setPages] = React.useState<React.ReactNode[]>([]);
 
+  // A4 page can fit approximately 50-60 lines of content with normal font size
+  // This constant represents approximate content lines that can fit on one A4 page
+  const LINES_PER_A4_PAGE = 55;
+
+  React.useEffect(() => {
+    if (userData) {
+      organizeContent();
+    }
+  }, [userData]);
+
+  // Function to estimate height of each section in lines
+  const estimateSectionHeight = (sectionType: string, data: any) => {
+    switch (sectionType) {
+      case "header":
+        return 8; // Fixed header size
+      case "education":
+        // Base + 5 lines per education entry
+        return data?.length ? 4 + data.length * 5 : 0;
+      case "experience":
+        // Base + 7 lines per experience entry (including description)
+        return data?.length ? 4 + data.length * 7 : 0;
+      case "projects":
+        // Base + 7 lines per project (including description and link)
+        return data?.length ? 4 + data.length * 7 : 0;
+      case "skills":
+        // Base + 1 line per 2 skills (grid layout)
+        return data?.length ? 4 + Math.ceil(data.length / 2) : 0;
+      case "languages":
+        // Base + 1 line per 2 languages (grid layout)
+        return data?.length ? 4 + Math.ceil(data.length / 2) : 0;
+      case "certifications":
+        // Base + 3 lines per certification
+        return data?.length ? 4 + data.length * 3 : 0;
+      default:
+        return 0;
+    }
+  };
+
+  // Function to organize content into pages with better page balancing
+  const organizeContent = () => {
+    if (!userData) return;
+
+    // Define sections and their data
+    const sectionsConfig = [
+      { type: "header", render: renderHeader, data: userData },
+      { type: "education", render: renderEducation, data: userData.education },
+      {
+        type: "experience",
+        render: renderResearchExperience,
+        data: userData.experience,
+      },
+      {
+        type: "projects",
+        render: renderPublicationsProjects,
+        data: userData.projects,
+      },
+      { type: "skills", render: renderSkills, data: userData.skills },
+      { type: "languages", render: renderLanguages, data: userData.languages },
+      {
+        type: "certifications",
+        render: renderCertifications,
+        data: userData.certifications,
+      },
+    ];
+
+    // Filter out empty sections
+    const validSections = sectionsConfig.filter((section) => {
+      if (section.type === "header") return true;
+      return Array.isArray(section.data) && section.data.length > 0;
+    });
+
+    const pagesContent: React.ReactNode[] = [];
+    let currentPageSections: React.ReactNode[] = [];
+    let currentPageHeight = 0;
+
+    // Distribute sections across pages
+    validSections.forEach((section) => {
+      const sectionHeight = estimateSectionHeight(section.type, section.data);
+
+      // If adding this section would exceed page height and we already have content,
+      // finalize current page and start a new one
+      if (
+        currentPageHeight + sectionHeight > LINES_PER_A4_PAGE &&
+        currentPageSections.length > 0
+      ) {
+        pagesContent.push(renderPage(currentPageSections));
+        currentPageSections = [];
+        currentPageHeight = 0;
+      }
+
+      // If a single section is too big for a page, it will get its own page
+      const renderedSection = section.render();
+      if (renderedSection) {
+        currentPageSections.push(renderedSection);
+        currentPageHeight += sectionHeight;
+      }
+    });
+
+    // Add the last page if there's content left
+    if (currentPageSections.length > 0) {
+      pagesContent.push(renderPage(currentPageSections));
+    }
+
+    setPages(pagesContent);
+  };
+
+  // Render a page with given sections
+  const renderPage = (sections: React.ReactNode[]) => (
+    <div className="p-8">{sections}</div>
+  );
+
+  // Header section
+  const renderHeader = () => (
+    <header
+      className="mb-8 pb-4 border-b-2"
+      style={{ borderColor: primaryColor }}
+    >
+      <h1 className="text-3xl font-bold mb-2">
+        {userData?.name || "Loading..."}
+      </h1>
+      {userData && (
+        <p className="text-gray-700 mb-4">
+          {userData.aspiringRoles && userData.aspiringRoles.length > 0
+            ? userData.aspiringRoles[0]
+            : "Academic Professional"}
+        </p>
+      )}
+      {userData && (
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div>
+            {userData.education && userData.education.length > 0 && (
+              <p>{userData.education[0].institution}</p>
+            )}
+            <p>Email: {userData.email}</p>
+          </div>
+          <div>
+            {userData.linkedIn && (
+              <p>
+                🔗{" "}
+                <a
+                  href={
+                    userData.linkedIn.startsWith("http")
+                      ? userData.linkedIn
+                      : `https://www.linkedin.com/in/${userData.linkedIn}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: primaryColor,
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                  }}
+                >
+                  LinkedIn
+                </a>
+              </p>
+            )}
+            {userData.github && (
+              <p>
+                🐙{" "}
+                <a
+                  href={
+                    userData.github.startsWith("http")
+                      ? userData.github
+                      : `https://github.com/${userData.github}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: primaryColor,
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                  }}
+                >
+                  GitHub
+                </a>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </header>
+  );
+
+  // Education section
+  const renderEducation = () => {
+    if (!userData || !userData.education || userData.education.length === 0)
+      return null;
+
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: primaryColor }}
+        >
+          Education
+        </h2>
+        <div className="space-y-6">
+          {userData.education.map((edu, index) => (
+            <div key={index}>
+              <h3 className="font-semibold">{edu.degree}</h3>
+              <p className="italic">
+                {edu.institution}, {edu.year_of_start} -{" "}
+                {edu.year_of_completion}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Research Experience section
+  const renderResearchExperience = () => {
+    if (!userData || !userData.experience || userData.experience.length === 0)
+      return null;
+
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: primaryColor }}
+        >
+          Research Experience
+        </h2>
+        <div className="space-y-6">
+          {userData.experience.map((exp, index) => (
+            <div key={index}>
+              <h3 className="font-semibold">{exp.jobTitle}</h3>
+              <p className="italic">
+                {exp.company}, {formatDate(exp.startDate)} -{" "}
+                {formatDate(exp.endDate)}
+              </p>
+              <ul className="list-disc ml-4 mt-2 text-gray-700">
+                <li>{exp.description}</li>
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Publications & Projects section
+  const renderPublicationsProjects = () => {
+    if (!userData || !userData.projects || userData.projects.length === 0)
+      return null;
+
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: primaryColor }}
+        >
+          Publications & Projects
+        </h2>
+        <div className="space-y-4">
+          {userData.projects.map((project, index) => (
+            <div key={index}>
+              <h3 className="font-semibold">{project.name}</h3>
+              <p className="italic">
+                {formatDate(project.startDate)} - {formatDate(project.endDate)}
+              </p>
+              <p className="mt-1 text-gray-700">{project.description}</p>
+              {project.link && (
+                <p>
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: primaryColor }}
+                    className="truncate inline-block max-w-full"
+                  >
+                    Link to publication
+                  </a>
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Skills section
+  const renderSkills = () => {
+    if (!userData || !userData.skills || userData.skills.length === 0)
+      return null;
+
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: primaryColor }}
+        >
+          Research Skills & Methods
+        </h2>
+        <div className="grid grid-cols-2 gap-2">
+          {userData.skills.map((skill, index) => (
+            <p key={index} className="text-gray-700">
+              • {skill.name}
+            </p>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Languages section
+  const renderLanguages = () => {
+    if (!userData || !userData.languages || userData.languages.length === 0)
+      return null;
+
+    return (
+      <section className="mb-8">
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: primaryColor }}
+        >
+          Languages
+        </h2>
+        <div className="grid grid-cols-2 gap-2">
+          {userData.languages.map((lang, index) => (
+            <p key={index} className="text-gray-700">
+              • {lang.language}: {lang.proficiency}
+            </p>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Certifications section
+  const renderCertifications = () => {
+    if (
+      !userData ||
+      !userData.certifications ||
+      userData.certifications.length === 0
+    )
+      return null;
+
+    return (
+      <section>
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: primaryColor }}
+        >
+          Certifications & Additional Training
+        </h2>
+        <div className="space-y-2">
+          {userData.certifications.map((cert, index) => (
+            <div key={index}>
+              <p className="font-semibold">{cert.name}</p>
+              <p className="italic">
+                {cert.organization}, {cert.year}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // Loading state
   if (!userData) {
     return (
       <div className={containerClass}>
@@ -1437,179 +2450,32 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
     );
   }
 
-  return (
-    <div className={containerClass}>
-      <div className="p-8">
-        {/* Header */}
-        <header
-          className="mb-8 pb-4 border-b-2"
-          style={{ borderColor: primaryColor }}
-        >
-          <h1 className="text-3xl font-bold mb-2">{userData.name}</h1>
-          <p className="text-gray-700 mb-4">
-            {userData.aspiringRoles && userData.aspiringRoles.length > 0
-              ? userData.aspiringRoles[0]
-              : "Academic Professional"}
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div>
-              {userData.education && userData.education.length > 0 && (
-                <p>{userData.education[0].institution}</p>
-              )}
-              <p>Email: {userData.email}</p>
-            </div>
-            <div>
-              {userData.linkedIn && <p>LinkedIn: {userData.linkedIn}</p>}
-              {userData.github && <p>GitHub: {userData.github}</p>}
-            </div>
-          </div>
-        </header>
-
-        {/* Education */}
-        {userData.education && userData.education.length > 0 && (
-          <section className="mb-8">
-            <h2
-              className="text-2xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Education
-            </h2>
-            <div className="space-y-6">
-              {userData.education.map((edu, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold">{edu.degree}</h3>
-                  <p className="italic">
-                    {edu.institution}, {edu.year_of_start} -{" "}
-                    {edu.year_of_completion}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Research Experience */}
-        {userData.experience && userData.experience.length > 0 && (
-          <section className="mb-8">
-            <h2
-              className="text-2xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Research Experience
-            </h2>
-            <div className="space-y-6">
-              {userData.experience.map((exp, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold">{exp.jobTitle}</h3>
-                  <p className="italic">
-                    {exp.company}, {formatDate(exp.startDate)} -{" "}
-                    {formatDate(exp.endDate)}
-                  </p>
-                  <ul className="list-disc ml-4 mt-2 text-gray-700">
-                    <li>{exp.description}</li>
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Publications/Projects */}
-        {userData.projects && userData.projects.length > 0 && (
-          <section className="mb-8">
-            <h2
-              className="text-2xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Publications & Projects
-            </h2>
-            <div className="space-y-4">
-              {userData.projects.map((project, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold">{project.name}</h3>
-                  <p className="italic">
-                    {formatDate(project.startDate)} -{" "}
-                    {formatDate(project.endDate)}
-                  </p>
-                  <p className="mt-1 text-gray-700">{project.description}</p>
-                  {project.link && (
-                    <p>
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: primaryColor }}
-                      >
-                        Link to publication
-                      </a>
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Skills and Methods */}
-        {userData.skills && userData.skills.length > 0 && (
-          <section className="mb-8">
-            <h2
-              className="text-2xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Research Skills & Methods
-            </h2>
-            <div className="grid grid-cols-2 gap-2">
-              {userData.skills.map((skill, index) => (
-                <p key={index} className="text-gray-700">
-                  • {skill.name}
-                </p>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Languages */}
-        {userData.languages && userData.languages.length > 0 && (
-          <section className="mb-8">
-            <h2
-              className="text-2xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Languages
-            </h2>
-            <div className="grid grid-cols-2 gap-2">
-              {userData.languages.map((lang, index) => (
-                <p key={index} className="text-gray-700">
-                  • {lang.language}: {lang.proficiency}
-                </p>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Certifications */}
-        {userData.certifications && userData.certifications.length > 0 && (
-          <section>
-            <h2
-              className="text-2xl font-semibold mb-4"
-              style={{ color: primaryColor }}
-            >
-              Certifications & Additional Training
-            </h2>
-            <div className="space-y-2">
-              {userData.certifications.map((cert, index) => (
-                <div key={index}>
-                  <p className="font-semibold">{cert.name}</p>
-                  <p className="italic">
-                    {cert.organization}, {cert.year}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+  // For first page, always include header and try to fit more sections
+  if (pages.length === 0) {
+    return (
+      <div className={containerClass}>
+        <div className="p-8">Organizing content...</div>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {pages.map((page, index) => (
+        <div
+          key={index}
+          className={`${containerClass} mb-6 print:mb-0 ${
+            index < pages.length - 1 ? "print:page-break-after-always" : ""
+          }`}
+        >
+          {page}
+          {index < pages.length - 1 && (
+            <div className="text-right text-gray-500 text-sm pr-4 pb-2">
+              Page {index + 1} of {pages.length}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
