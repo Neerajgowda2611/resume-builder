@@ -100,19 +100,53 @@ const formatDate = (dateString: string) => {
 };
 
 // Helper function to get A4 container class
+// const getA4ContainerClass = (font: FontType, preview: boolean) => {
+//   return cn(
+//     "bg-white",
+//     // A4 dimensions: 210mm x 297mm - but when preview, scale down
+//     preview
+//       ? "scale-[0.7] origin-top-left w-[210mm]"
+//       : "min-h-[297mm] w-[210mm] mx-auto shadow-lg",
+//     font === "inter" && "font-inter",
+//     font === "roboto" && "font-roboto",
+//     font === "opensans" && "font-opensans",
+//     font === "lato" && "font-lato"
+//   );
+// };
+
+// Helper function to get A4 container class
 const getA4ContainerClass = (font: FontType, preview: boolean) => {
-  return cn(
+  // Create the base classes
+  const baseClasses = cn(
     "bg-white",
     // A4 dimensions: 210mm x 297mm - but when preview, scale down
     preview
       ? "scale-[0.7] origin-top-left w-[210mm]"
-      : "min-h-[297mm] w-[210mm] mx-auto shadow-lg",
-    font === "inter" && "font-inter",
-    font === "roboto" && "font-roboto",
-    font === "opensans" && "font-opensans",
-    font === "lato" && "font-lato"
+      : "min-h-[297mm] w-[210mm] mx-auto shadow-lg"
   );
+  
+  // Add the font class based on the selection
+  let fontClass = '';
+  switch(font) {
+    case 'inter':
+      fontClass = 'font-inter';
+      break;
+    case 'roboto':
+      fontClass = 'font-roboto';
+      break;
+    case 'opensans':
+      fontClass = 'font-opensans';
+      break;
+    case 'lato':
+      fontClass = 'font-lato';
+      break;
+    default:
+      fontClass = 'font-inter'; // Default to Inter
+  }
+  
+  return `${baseClasses} ${fontClass}`;
 };
+
 
 // 1. Enhanced Minimal Classic Template with proper content distribution
 const MinimalClassic: React.FC<BaseTemplateProps> = ({
@@ -415,6 +449,13 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
         <div
           key={pageIndex}
           className={`${containerClass} h-[297mm] mb-8 page-break-after relative overflow-hidden`}
+          style={{fontFamily: 
+          font === "inter" ? "Inter, sans-serif" : 
+          font === "roboto" ? "Roboto, sans-serif" : 
+          font === "opensans" ? "Open Sans, sans-serif" : 
+          font === "lato" ? "Lato, sans-serif" : 
+          "inherit" 
+      }}
         >
           {/* Header only on first page */}
           {pageIndex === 0 && (
@@ -909,6 +950,19 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
   preview = false,
   userData,
 }) => {
+
+  const fontFamilyMap = {
+    inter: "'Inter', sans-serif",
+    roboto: "'Roboto', sans-serif",
+    opensans: "'Open Sans', sans-serif",
+    lato: "'Lato', sans-serif",
+  };
+  
+  // Get the font family string
+  const fontFamily = fontFamilyMap[font] || fontFamilyMap.inter;
+  
+  // Use your existing containerClass for other styling
+  // const containerClass = `${preview ? "" : "print:shadow-none"}`;
   // Define A4 dimensions in pixels (at 96 DPI)
   // A4: 210mm × 297mm ≈ 793px × 1123px
   const A4_WIDTH = 793;
@@ -1047,13 +1101,15 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
     setPages(newPages);
   }, [userData]);
 
-  const containerClass = `font-${font || "sans"} ${
-    preview ? "" : "print:shadow-none"
-  }`;
+  // const containerClass = `font-${font || "sans"} ${
+  //   preview ? "" : "print:shadow-none"
+  // }`;
+
+  const containerClass = `${preview ? "" : "print:shadow-none"}`;
 
   if (!userData) {
     return (
-      <div className={containerClass}>
+      <div className={containerClass} style={{fontFamily}}>
         <div className="p-8">Loading...</div>
       </div>
     );
@@ -1430,7 +1486,7 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
   };
 
   return (
-    <div className={containerClass}>
+    <div className={containerClass} style={{ fontFamily }}>
       {pages.map((page, pageIndex) => (
         <div
           key={pageIndex}
@@ -1441,6 +1497,7 @@ const BoldCreative: React.FC<BaseTemplateProps> = ({
             breakAfter: "page",
             breakInside: "avoid",
             overflow: "hidden",
+            fontFamily,
           }}
         >
           <div className="flex h-full">
@@ -2276,7 +2333,7 @@ const AcademicCV: React.FC<BaseTemplateProps> = ({
 
 // Main Resume Builder Component with side-by-side layout
 export default function ResumeBuilder() {
-  const [selectedTemplate, setSelectedTemplate] = useState("minimal");
+  const [selectedTemplate, setSelectedTemplate] = useState("bold");
   const [selectedFont, setSelectedFont] = useState<FontType>("inter");
   const [primaryColor, setPrimaryColor] = useState("#2563eb"); // Default blue
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -2486,15 +2543,15 @@ export default function ResumeBuilder() {
                       <SelectValue placeholder="Select template" />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      <SelectItem value="minimal">Minimal Classic</SelectItem>
-                      <SelectItem value="modern">
+                    <SelectItem value="bold">Bold Creative</SelectItem>
+                    <SelectItem value="modern">
                         Modern Professional
                       </SelectItem>
-                      <SelectItem value="bold">Bold Creative</SelectItem>
-                      <SelectItem value="academic">Academic CV</SelectItem>
+                      <SelectItem value="minimal">Minimal Classic</SelectItem>
                       <SelectItem value="technical">
                         Minimalist Technical
                       </SelectItem>
+                      <SelectItem value="academic">Academic CV</SelectItem>
                       {/* You can add the other templates here */}
                     </SelectContent>
                   </Select>
