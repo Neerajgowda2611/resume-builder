@@ -3,7 +3,7 @@ import React, { useState, useEffect, use } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Download, Eye } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -13,6 +13,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@clerk/nextjs";
+// import { toast } from "@/components/ui/toast"; 
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import toast from "react-hot-toast";
 
 // Define types for our data (keeping the same interfaces)
 interface Education {
@@ -509,7 +513,7 @@ const MinimalClassic: React.FC<BaseTemplateProps> = ({
   );
 };
 
-// Enhanced Modern Professional Template with pagination support
+//2 Enhanced Modern Professional Template with pagination support
 const ModernProfessional: React.FC<BaseTemplateProps> = ({
   font,
   primaryColor,
@@ -2338,7 +2342,11 @@ export default function ResumeBuilder() {
   const [primaryColor, setPrimaryColor] = useState("#2563eb"); // Default blue
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [exportLoading, setExportLoading] = useState(false);
   const { userId } = useAuth();
+  // Reference to the resume container
+  const resumeContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Get template component based on selection
   const getTemplateComponent = () => {
@@ -2515,6 +2523,270 @@ export default function ResumeBuilder() {
     fetchUserData();
   }, [userId]);
 
+  // // Function to generate and download PDF
+  // const handleExportPDF = async () => {
+  //   if (!resumeContainerRef.current || !userData) {
+  //     console.log("No resume container or user data available");
+  //     return;
+  //   }
+
+  //   try {
+  //     setExportLoading(true);
+      
+  //     // Notify the user
+  //     // toast({
+  //     //   title: "Preparing PDF",
+  //     //   description: "This may take a few seconds...",
+  //     // });
+  //     console.log("Preparing PDF...");
+
+  //     // Get all resume pages
+  //     const resumePages = resumeContainerRef.current.querySelectorAll('.page-break-after');
+      
+  //     // Create a new PDF document (A4 size)
+  //     const pdf = new jsPDF({
+  //       orientation: 'portrait',
+  //       unit: 'mm',
+  //       format: 'a4',
+  //     });
+      
+  //     // Process each page
+  //     for (let i = 0; i < resumePages.length; i++) {
+  //       const page = resumePages[i] as HTMLElement;
+        
+  //       // Apply a temporary style to ensure proper rendering
+  //       page.style.transform = 'none';
+  //       page.style.width = '210mm';
+  //       page.style.height = '297mm';
+  //       page.style.margin = '0';
+  //       page.style.padding = '0';
+        
+  //       // Capture the page as canvas
+  //       const canvas = await html2canvas(page, {
+  //         scale: 2, // Higher scale for better quality
+  //         useCORS: true,
+  //         allowTaint: true,
+  //         backgroundColor: '#ffffff',
+  //         logging: false,
+  //       });
+        
+  //       // Reset the temporary styles
+  //       page.style.transform = '';
+  //       page.style.width = '';
+  //       page.style.height = '';
+  //       page.style.margin = '';
+  //       page.style.padding = '';
+        
+  //       // Convert to image and add to PDF
+  //       const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        
+  //       // Add a new page for all pages except the first one
+  //       if (i > 0) {
+  //         pdf.addPage();
+  //       }
+        
+  //       // Add the image to the PDF
+  //       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+  //     }
+      
+  //     // Generate filename based on user data and template
+  //     const fileName = `${userData.name.replace(/\s+/g, '_')}_Resume_${selectedTemplate}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+  //     // Save the PDF
+  //     pdf.save(fileName);
+      
+  //     // toast({
+  //     //   message: "Success!",
+  //     //   description: "Your resume has been downloaded as a PDF.",
+  //     // });
+
+  //     console.log("PDF generated successfully");
+  //   } catch (error) {
+  //     console.error('Error generating PDF:', error);
+  //     // toast({
+  //     //   title: "Error",
+  //     //   description: "Failed to generate PDF. Please try again.",
+  //     //   variant: "destructive",
+  //     // });
+      
+  //   } finally {
+  //     setExportLoading(false);
+  //   }
+  // };
+
+  const handleExportPDF = async () => {
+    if (!resumeContainerRef.current || !userData) {
+      console.log("No resume container or user data available");
+      return;
+    }
+  
+    try {
+      setExportLoading(true);
+      console.log("Preparing PDF...");
+  
+      // Get the main resume container
+      const resumeContainer = resumeContainerRef.current;
+      
+      // First try to find pages with the class 'page-break-after'
+      let resumePages = resumeContainer.querySelectorAll('.page-break-after');
+      
+      // If no pages found with that class, fall back to other selectors based on template
+      if (resumePages.length === 0) {
+        console.log("No '.page-break-after' elements found. Trying alternative selectors...");
+        
+        // Try different selectors based on template structure
+        // This assumes each template might have a different structure
+        const possibleSelectors = [
+          '.resume-page', 
+          '.resume-container', 
+          '.template-container',
+          `.${selectedTemplate}-container`,
+          '.cv-page'
+        ];
+        
+        // Try each selector until we find something
+        for (const selector of possibleSelectors) {
+          const elements = resumeContainer.querySelectorAll(selector);
+          if (elements.length > 0) {
+            resumePages = elements;
+            console.log(`Found ${elements.length} pages using selector: ${selector}`);
+            break;
+          }
+        }
+        
+        // If still no pages found with alternative selectors, use the container itself
+        if (resumePages.length === 0) {
+          console.log("Using the main resume container as a single page");
+          const fragment = document.createDocumentFragment();
+          fragment.appendChild(resumeContainer.cloneNode(true));
+          resumePages = fragment.childNodes as NodeListOf<Element>;
+        }
+      }
+      
+      console.log(`Found ${resumePages.length} pages to export`);
+      
+      // Create a new PDF document (A4 size)
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+      
+      // Process each page
+      for (let i = 0; i < resumePages.length; i++) {
+        const page = resumePages[i] as HTMLElement;
+        
+        console.log(`Processing page ${i}:`, {
+          width: page.offsetWidth,
+          height: page.offsetHeight,
+          classList: Array.from(page.classList)
+        });
+        
+        // Create a temporary container for rendering
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.top = '-9999px';
+        document.body.appendChild(tempContainer);
+        
+        // Clone the page into the temporary container
+        const clonedPage = page.cloneNode(true) as HTMLElement;
+        tempContainer.appendChild(clonedPage);
+        
+        // Apply necessary styles for proper rendering
+        clonedPage.style.width = '210mm';
+        clonedPage.style.height = '297mm';
+        clonedPage.style.margin = '0';
+        clonedPage.style.padding = '0';
+        clonedPage.style.transform = 'none';
+        clonedPage.style.display = 'block';
+        clonedPage.style.visibility = 'visible';
+        clonedPage.style.opacity = '1';
+        clonedPage.style.position = 'relative';
+        clonedPage.style.overflow = 'visible';
+        clonedPage.style.backgroundColor = '#ffffff';
+        
+        // Ensure all child elements are visible and properly rendered
+        const allElements = clonedPage.querySelectorAll('*');
+        allElements.forEach((el) => {
+          const element = el as HTMLElement;
+          if (element.style) {
+            element.style.visibility = 'visible';
+            element.style.display = element.style.display === 'none' ? 'block' : element.style.display;
+            element.style.opacity = '1';
+          }
+        });
+        
+        // Wait for any images to load
+        const images = clonedPage.querySelectorAll('img');
+        if (images.length > 0) {
+          console.log(`Waiting for ${images.length} images to load on page ${i}`);
+          await Promise.all(Array.from(images).map(img => {
+            return new Promise((resolve) => {
+              if (img.complete) resolve(null);
+              else {
+                img.onload = () => resolve(null);
+                img.onerror = () => resolve(null);
+              }
+            });
+          }));
+        }
+        
+        // Wait a moment for any rendering to complete
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        try {
+          // Capture the cloned page as canvas
+          const canvas = await html2canvas(clonedPage, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: true,
+            windowWidth: 1000, // Set a fixed window width
+            windowHeight: 1414, // A4 equivalent in pixels at 96 DPI
+          });
+          
+          // Convert to image
+          const imgData = canvas.toDataURL('image/jpeg', 1.0);
+          
+          // Check if we got valid image data
+          if (imgData === 'data:,' || imgData === 'data:image/jpeg;base64,') {
+            console.error(`Failed to capture page ${i} - empty canvas returned`);
+            continue;
+          }
+          
+          // Add a new page for all pages except the first one
+          if (i > 0) {
+            pdf.addPage();
+          }
+          
+          // Add the image to the PDF
+          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+          console.log(`Successfully added page ${i} to PDF`);
+        } catch (error) {
+          console.error(`Error capturing page ${i}:`, error);
+        } finally {
+          // Clean up temporary container
+          document.body.removeChild(tempContainer);
+        }
+      }
+      
+      // Generate filename based on user data and template
+      const fileName = `${userData.name.replace(/\s+/g, '_')}_Resume_${selectedTemplate}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      // Save the PDF
+      pdf.save(fileName);
+      
+      console.log("PDF generated successfully");
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert(`Failed to generate PDF: ${error}`);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 max-w-7xl">
       <h1 className="text-3xl font-bold mb-6"></h1>
@@ -2600,10 +2872,22 @@ export default function ResumeBuilder() {
                   </div>
                 </div>
 
-                {/* Export Button */}
-                <Button className="w-full mt-8">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Export as PDF
+                <Button 
+                  className="w-full mt-8" 
+                  onClick={handleExportPDF}
+                  disabled={isLoading || exportLoading}
+                >
+                  {exportLoading ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 mr-2 border-2 border-b-transparent rounded-full"></div>
+                      Generating PDF...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      Export as PDF
+                    </>
+                  )}
                 </Button>
               </div>
             </CardContent>
@@ -2625,7 +2909,7 @@ export default function ResumeBuilder() {
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-center">
+                <div className="flex justify-center" ref={resumeContainerRef}>
                   {getTemplateComponent()}
                 </div>
               )}
