@@ -86,6 +86,7 @@ export const Navbar = () => {
           <div className="flex items-center space-x-6">
             <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/dashboard/template">Templates</NavLink>
+            <NavLink href="/dashboard/prepare">Prepare</NavLink>
           </div>
         </div>
       </div>
