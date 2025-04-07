@@ -104,21 +104,6 @@ const formatDate = (dateString: string) => {
 };
 
 // Helper function to get A4 container class
-// const getA4ContainerClass = (font: FontType, preview: boolean) => {
-//   return cn(
-//     "bg-white",
-//     // A4 dimensions: 210mm x 297mm - but when preview, scale down
-//     preview
-//       ? "scale-[0.7] origin-top-left w-[210mm]"
-//       : "min-h-[297mm] w-[210mm] mx-auto shadow-lg",
-//     font === "inter" && "font-inter",
-//     font === "roboto" && "font-roboto",
-//     font === "opensans" && "font-opensans",
-//     font === "lato" && "font-lato"
-//   );
-// };
-
-// Helper function to get A4 container class
 const getA4ContainerClass = (font: FontType, preview: boolean) => {
   // Create the base classes
   const baseClasses = cn(
