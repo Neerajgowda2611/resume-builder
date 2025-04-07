@@ -88,6 +88,7 @@ export const Navbar = () => {
             <NavLink href="/dashboard/template">Templates</NavLink>
             <NavLink href="/dashboard/prepare">AI-Recommendations</NavLink>
             <NavLink href="/dashboard/cover-letter">Cover-Letter Maker</NavLink>
+            <NavLink href="/dashboard/Jobs">Jobs</NavLink>
           </div>
         </div>
       </div>
