@@ -37,14 +37,14 @@ export default function Home() {
     {
       title: "Job Recommendations",
       description: "Discover AI-curated job openings that match your skills and experience",
-      href: "/jobs",
+      href: "dashboard/jobs",
       primary: false,
       icon: "💼",
     },
     {
       title: "Cover Letter Generator",
       description: "Create customized cover letters by AI  for specific job applications",
-      href: "/cover-letter",
+      href: "dashboard/cover-letter",
       primary: false,
       icon: "✉️",
     },
