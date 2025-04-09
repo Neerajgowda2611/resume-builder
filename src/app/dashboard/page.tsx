@@ -10,6 +10,13 @@ export default function Home() {
 
   useEffect(() => {
     setLoaded(true);
+    // Make API call to sync Clerk users when page loads
+    fetch('http://localhost:8000/api/sync-clerk-users', {
+      method: 'POST',
+    }).catch(error => {
+      // Silent failure - we don't need to handle the response as requested
+      console.log('Background sync initiated');
+    });
   }, []);
 
   const features = [

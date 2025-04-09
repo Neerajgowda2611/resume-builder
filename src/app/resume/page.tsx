@@ -1315,6 +1315,8 @@
                           name: "",
                           organization: "",
                           year: "",
+                          credentialId:"",
+                          credentialUrl: "",
                         })
                       }
                     >
@@ -1456,10 +1458,6 @@
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-                {/* The rest of your accordion items would go here */}
-                {/* Continue with your original code for all the other sections */}
-                {/* For brevity, I've omitted the rest of the accordion sections here */}
-                {/* They would be exactly the same as in your original code */}
               </Accordion>
 
               <CardFooter className="flex justify-between space-x-4 px-0">
