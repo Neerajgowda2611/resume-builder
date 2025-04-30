@@ -3,7 +3,7 @@ import React, { useState, useEffect, use } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Eye } from "lucide-react";
+import { ArrowLeft, Download, Eye } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -2784,6 +2784,16 @@ export default function ResumeBuilder() {
                       Export as PDF
                     </>
                   )}
+                </Button>
+
+                {/* Go Back to Dashboard Button */}
+                <Button 
+                  className="w-full" 
+                  variant="outline"
+                  onClick={() => window.location.href = '/dashboard'}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Go Back to Dashboard
                 </Button>
               </div>
             </CardContent>

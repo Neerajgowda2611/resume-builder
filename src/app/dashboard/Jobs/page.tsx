@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalendarIcon, MapPinIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react';
+import { CalendarIcon, MapPinIcon, ExternalLinkIcon, RefreshCwIcon, ArrowLeft } from 'lucide-react';
 
 interface Job {
   job_position: string;
@@ -170,6 +170,19 @@ const JobsPage: React.FC = () => {
   return (
     <div className="pt-24 min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Back to Dashboard Button (Top Left) */}
+        <div className="absolute top-24 left-4 sm:left-6 lg:left-8">
+          <Button
+            variant="outline"
+            onClick={() => window.location.href = '/dashboard'}
+            className="text-xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text mb-4"
+            size="sm"
+          >
+            <ArrowLeft size={16} color='purple' />
+            Back to Dashboard
+          </Button>
+        </div>
+        
         {/* Header */}
         <motion.div
           className="text-center mb-12"
@@ -312,6 +325,7 @@ const JobsPage: React.FC = () => {
         ) : null}
       </div>
     </div>
+
   );
 };
 

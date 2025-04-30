@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 
 const PrepareSkillsPage: React.FC = () => {
   const { user } = useUser();
@@ -317,6 +318,25 @@ const PrepareSkillsPage: React.FC = () => {
               {renderExperienceSection("Valuable Certifications", data.experience_improvement.certifications, "certifications")}
               {renderExperienceSection("Internship Opportunities", data.experience_improvement.internships, "internships")}
             </div>
+            
+            {/* Dashboard Button */}
+            <div className="mt-12 flex justify-center">
+              <motion.button
+                onClick={() => window.location.href = '/dashboard'}
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-full shadow-lg transition-all duration-300"
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: "0 15px 25px -5px rgba(59, 130, 246, 0.5)",
+                  y: -5
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="flex items-center">
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  Go Back to Dashboard
+                </span>
+              </motion.button>
+            </div>
           </motion.div>
         ) : user ? (
           <div className="flex justify-center">
@@ -334,6 +354,27 @@ const PrepareSkillsPage: React.FC = () => {
             </motion.button>
           </div>
         ) : null}
+        
+        {/* Dashboard Button when no recommendations are shown */}
+        {!isLoading && !data && user && (
+          <div className="flex justify-center mt-6">
+            <motion.button
+              onClick={() => window.location.href = '/dashboard'}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-full shadow-lg transition-all duration-300"
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: "0 15px 25px -5px rgba(59, 130, 246, 0.5)",
+                y: -5
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="flex items-center">
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Go Back to Dashboard
+              </span>
+            </motion.button>
+          </div>
+        )}
       </div>
     </div>
   );

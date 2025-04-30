@@ -403,9 +403,9 @@ const CoverLetterPage: React.FC = () => {
               <Button
                 variant="outline"
                 className="border-purple-400 text-purple-300 hover:bg-purple-900/20"
-                onClick={() => window.open("/networking", "_self")}
+                onClick={() => window.open("/dashboard", "_self")}
               >
-                View All Resources
+                Go Back to Dashboard
               </Button>
             </div>
           )}

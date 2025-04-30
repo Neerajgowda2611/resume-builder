@@ -36,6 +36,7 @@
     Trash2,
     Save,
     X,
+    ArrowLeft,
   } from "lucide-react";
   import { useAuth } from "@clerk/nextjs";
 
@@ -778,7 +779,7 @@
                                 handleObjectChange(
                                   "experience",
                                   index,
-                                  "startdate",
+                                  "startDate",
                                   e.target.value
                                 )
                               }
@@ -1461,7 +1462,18 @@
               </Accordion>
 
               <CardFooter className="flex justify-between space-x-4 px-0">
-                {/* Add a Delete button that only shows when a resume exists */}
+                {/* Back Button */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.location.href = '/dashboard'}
+                  className="min-w-32"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Dashboard
+                </Button>
+
+                {/* Delete Button - only shows when a resume exists */}
                 {resumeExists && (
                   <Button
                     type="button"
@@ -1484,10 +1496,11 @@
                   </Button>
                 )}
 
+                {/* Save/Update Button */}
                 <Button
                   type="submit"
                   disabled={loading || !userId}
-                  className="min-w-32 ml-auto"
+                  className="min-w-32"
                 >
                   {loading ? (
                     <>
@@ -1501,7 +1514,6 @@
                     </>
                   )}
                 </Button>
-                
               </CardFooter>
             </form>
           </CardContent>

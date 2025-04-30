@@ -44,7 +44,7 @@ export default function Home() {
     {
       title: "Job Recommendations",
       description: "Discover AI-curated job openings that match your skills and experience",
-      href: "dashboard/jobs",
+      href: "dashboard/Jobs",
       primary: false,
       icon: "💼",
     },
